@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Github, Twitter, Discord } from "lucide-react";
+import { Github, Twitter, MessageCircle } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -24,7 +24,7 @@ export const Footer = () => {
                 <Github className="w-5 h-5" />
               </a>
               <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                <Discord className="w-5 h-5" />
+                <MessageCircle className="w-5 h-5" />
               </a>
             </div>
           </div>

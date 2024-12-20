@@ -13,7 +13,7 @@ export const PricingSection = () => {
               key={index} 
               className={`p-6 bg-gray-900/50 border transition-all duration-300 hover:transform hover:-translate-y-1 ${
                 plan.name === "Pro" 
-                  ? "border-primary-400/50 shadow-lg shadow-primary-400/20 relative before:absolute before:inset-0 before:rounded-lg before:p-[1px] before:bg-gradient-to-r before:from-primary-400 before:to-accent before:-z-10" 
+                  ? "relative before:absolute before:inset-0 before:rounded-lg before:p-[1px] before:bg-gradient-to-r before:from-primary-400 before:to-accent before:-z-10 before:animate-pulse" 
                   : "border-gray-800"
               }`}
             >

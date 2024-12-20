@@ -1,5 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { Menu } from "lucide-react";
 import { useState } from "react";
 
@@ -18,13 +26,45 @@ export const Navbar = () => {
             </Link>
           </div>
           
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/pricing" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-              Pricing
-            </Link>
-            <Link to="/about" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-              About
-            </Link>
+          <div className="hidden md:flex items-center">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-gray-300 hover:text-white">
+                    Features
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 w-[400px]">
+                      <li className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/features"
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
+                          >
+                            <div className="mb-2 mt-4 text-lg font-medium text-white">
+                              Website Builder
+                            </div>
+                            <p className="text-sm leading-tight text-white/90">
+                              Create stunning websites with our easy-to-use builder
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/pricing" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    Pricing
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/about" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    About
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -33,7 +73,7 @@ export const Navbar = () => {
                 Sign In
               </Button>
             </Link>
-            <Link to="/sign-up">
+            <Link to="/onboarding">
               <Button className="bg-primary hover:bg-primary-600 text-white">
                 Get Started
               </Button>
@@ -47,7 +87,6 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
@@ -68,7 +107,7 @@ export const Navbar = () => {
                   Sign In
                 </Button>
               </Link>
-              <Link to="/sign-up">
+              <Link to="/onboarding">
                 <Button className="w-full bg-primary hover:bg-primary-600 text-white">
                   Get Started
                 </Button>

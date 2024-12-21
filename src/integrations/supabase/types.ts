@@ -9,7 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      website_info: {
+        Row: {
+          address: string | null
+          business_name: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          services: Json | null
+          social_links: Json | null
+          tagline: string | null
+          updated_at: string | null
+          user_id: string | null
+          website_type: Database["public"]["Enums"]["website_type"]
+        }
+        Insert: {
+          address?: string | null
+          business_name?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          services?: Json | null
+          social_links?: Json | null
+          tagline?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website_type: Database["public"]["Enums"]["website_type"]
+        }
+        Update: {
+          address?: string | null
+          business_name?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          services?: Json | null
+          social_links?: Json | null
+          tagline?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website_type?: Database["public"]["Enums"]["website_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +65,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      website_type: "portfolio" | "business" | "personal"
     }
     CompositeTypes: {
       [_ in never]: never

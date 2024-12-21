@@ -5,12 +5,13 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { AuthChangeEvent } from "@supabase/supabase-js";
 
 const SignUp = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
       if (event === "SIGNED_UP" && session) {
         navigate("/auth/signin?new_user=true");
       }

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -17,6 +17,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -34,6 +35,10 @@ export const Navbar = () => {
       toast.success("Signed out successfully");
       navigate("/");
     }
+  };
+
+  const handleGetStarted = () => {
+    navigate("/auth/signup");
   };
 
   return (
@@ -108,16 +113,21 @@ export const Navbar = () => {
               </div>
             ) : (
               <>
-                <Link to="/auth/signin">
-                  <Button variant="ghost" className="text-gray-300 hover:text-white">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/onboarding">
-                  <Button className="bg-primary hover:bg-primary-600 text-white">
-                    Get Started
-                  </Button>
-                </Link>
+                {!location.pathname.includes('/auth') && (
+                  <>
+                    <Link to="/auth/signin">
+                      <Button variant="ghost" className="text-gray-300 hover:text-white">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Button 
+                      className="bg-primary hover:bg-primary-600 text-white"
+                      onClick={handleGetStarted}
+                    >
+                      Get Started
+                    </Button>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -167,11 +177,12 @@ export const Navbar = () => {
                       Sign In
                     </Button>
                   </Link>
-                  <Link to="/onboarding">
-                    <Button className="w-full bg-primary hover:bg-primary-600 text-white">
-                      Get Started
-                    </Button>
-                  </Link>
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary-600 text-white"
+                    onClick={handleGetStarted}
+                  >
+                    Get Started
+                  </Button>
                 </>
               )}
             </div>

@@ -76,7 +76,7 @@ export function PortfolioInfoForm() {
       if (saveError) throw saveError;
 
       toast.success("Information saved successfully!");
-      navigate("/dashboard");
+      navigate("/templates");
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to save information. Please try again.");

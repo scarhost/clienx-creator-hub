@@ -21,7 +21,7 @@ export function PortfolioEducation({ form }: PortfolioEducationProps) {
                 className="min-h-[100px]"
                 {...field}
               />
-            </Control>
+            </FormControl>
             <FormDescription>
               Include degree, institution, and graduation year
             </FormDescription>

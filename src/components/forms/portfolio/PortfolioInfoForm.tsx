@@ -48,7 +48,8 @@ export function PortfolioInfoForm() {
       
       if (!session?.user) {
         localStorage.setItem('pendingPortfolioInfo', JSON.stringify(values));
-        toast.info("Please sign up to continue");
+        localStorage.setItem('pendingWebsiteType', 'Portfolio');
+        toast.info("Please create an account to continue");
         navigate("/auth/signup");
         return;
       }
@@ -75,7 +76,7 @@ export function PortfolioInfoForm() {
       if (saveError) throw saveError;
 
       toast.success("Information saved successfully!");
-      navigate("/templates/portfolio");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to save information. Please try again.");

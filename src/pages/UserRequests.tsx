@@ -61,16 +61,16 @@ const UserRequests = () => {
   const fetchUserRequests = async (userId: string) => {
     try {
       setLoading(true);
-      // Using any to bypass type checking since our database schema has been updated
       const { data, error } = await supabase
-        .from("website_requests" as any)
+        .from("website_requests")
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       
-      setRequests(data as WebsiteRequest[] || []);
+      // Fix the TypeScript error by properly casting the data
+      setRequests((data as WebsiteRequest[]) || []);
     } catch (error) {
       console.error("Error fetching requests:", error);
       toast.error("Failed to load your requests");

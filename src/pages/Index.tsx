@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Link } from "react-router-dom";
@@ -30,18 +31,18 @@ const Index = () => {
             <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="text-center">
                 <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                  <span className="block">Create Your Professional</span>
+                  <span className="block">Request Your Perfect</span>
                   <span className="block bg-gradient-to-r from-primary-400 to-accent bg-clip-text text-transparent">
-                    Website in Minutes
+                    Custom Website
                   </span>
                 </h1>
                 <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-300">
-                  Choose your website type and let us guide you through the process of creating your perfect website.
+                  Browse our professional templates, tell us what you want to customize, and we'll create the perfect website for you.
                 </p>
                 <div className="mt-10 flex justify-center">
-                  <Link to="/onboarding">
+                  <Link to="/templates">
                     <Button size="lg" className="bg-primary hover:bg-primary-600 shadow-lg shadow-primary/25 animate-fade-up">
-                      Get Started
+                      Browse Templates
                     </Button>
                   </Link>
                 </div>

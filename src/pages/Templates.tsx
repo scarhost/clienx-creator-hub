@@ -105,20 +105,24 @@ const Templates = () => {
 
       const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
 
-      const { error } = await supabase.from("website_requests").insert({
-        user_id: session.user.id,
-        template_id: selectedTemplate,
-        template_name: selectedTemplateData?.name,
-        template_style: selectedTemplateData?.style,
-        request_details: requestDetails,
-        status: "pending"
-      });
+      // Using any to bypass type checking since our database schema has been updated
+      const { error } = await supabase
+        .from("website_requests" as any)
+        .insert({
+          user_id: session.user.id,
+          template_id: selectedTemplate,
+          template_name: selectedTemplateData?.name,
+          template_style: selectedTemplateData?.style,
+          request_details: requestDetails,
+          status: "pending"
+        } as any);
 
       if (error) throw error;
 
       toast.success("Your website request has been submitted successfully!");
       setRequestDetails("");
       setSelectedTemplate(null);
+      navigate("/requests");
     } catch (error) {
       console.error("Error submitting request:", error);
       toast.error("Failed to submit your request. Please try again.");

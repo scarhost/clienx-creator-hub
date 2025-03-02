@@ -57,6 +57,45 @@ export type Database = {
         }
         Relationships: []
       }
+      website_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          id: string
+          request_details: string
+          status: string
+          template_id: number
+          template_name: string
+          template_style: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          id?: string
+          request_details: string
+          status?: string
+          template_id: number
+          template_name: string
+          template_style: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          id?: string
+          request_details?: string
+          status?: string
+          template_id?: number
+          template_name?: string
+          template_style?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

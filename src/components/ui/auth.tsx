@@ -1,10 +1,12 @@
 
 import { Auth as SupabaseAuth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { supabase } from '@/integrations/supabase/client';
 
-export const Auth = ({ ...props }) => {
+export const Auth = ({ supabaseClient = supabase, ...props }) => {
   return (
     <SupabaseAuth
+      supabaseClient={supabaseClient}
       {...props}
       providers={[]} // Empty providers array removes all social logins
       appearance={{

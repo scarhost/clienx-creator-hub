@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Filter, ChevronRight } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -13,7 +15,16 @@ const Templates = () => {
   const navigate = useNavigate();
   const [selectedStyle, setSelectedStyle] = useState<string>("all");
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
-  const [requestDetails, setRequestDetails] = useState("");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    companyName: "",
+    requestDetails: "",
+    preferredColor: "",
+    deadline: "",
+    budget: ""
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const styles = [
@@ -77,6 +88,10 @@ const Templates = () => {
     setSelectedTemplate(templateId === selectedTemplate ? null : templateId);
   };
 
+  const handleFormInput = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleSubmitRequest = async () => {
     try {
       setIsSubmitting(true);
@@ -86,7 +101,7 @@ const Templates = () => {
       if (!session?.user) {
         localStorage.setItem('pendingTemplateRequest', JSON.stringify({
           templateId: selectedTemplate,
-          requestDetails
+          formData
         }));
         toast.info("Please create an account to submit your request");
         navigate("/auth/signup");
@@ -98,29 +113,48 @@ const Templates = () => {
         return;
       }
 
-      if (!requestDetails.trim()) {
-        toast.error("Please provide details about your request");
+      if (!formData.fullName || !formData.email || !formData.phone || !formData.requestDetails) {
+        toast.error("Please fill in all required fields");
         return;
       }
 
       const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
 
-      // Using any to bypass type checking since our database schema has been updated
       const { error } = await supabase
-        .from("website_requests" as any)
+        .from("website_requests")
         .insert({
           user_id: session.user.id,
           template_id: selectedTemplate,
           template_name: selectedTemplateData?.name,
           template_style: selectedTemplateData?.style,
-          request_details: requestDetails,
+          request_details: `
+Full Name: ${formData.fullName}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Company: ${formData.companyName}
+Preferred Colors: ${formData.preferredColor}
+Deadline: ${formData.deadline}
+Budget: ${formData.budget}
+
+Custom Requirements:
+${formData.requestDetails}
+          `.trim(),
           status: "pending"
-        } as any);
+        });
 
       if (error) throw error;
 
       toast.success("Your website request has been submitted successfully!");
-      setRequestDetails("");
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        companyName: "",
+        requestDetails: "",
+        preferredColor: "",
+        deadline: "",
+        budget: ""
+      });
       setSelectedTemplate(null);
       navigate("/requests");
     } catch (error) {
@@ -157,25 +191,23 @@ const Templates = () => {
           {filteredTemplates.map((template) => (
             <Card 
               key={template.id} 
-              className={`overflow-hidden transition-all ${selectedTemplate === template.id ? 'ring-2 ring-primary' : ''}`}
+              className={`overflow-hidden transition-all cursor-pointer ${selectedTemplate === template.id ? 'ring-2 ring-primary' : ''}`}
               onClick={() => handleTemplateSelect(template.id)}
             >
               <div 
                 className="aspect-video bg-gray-800 bg-center bg-cover" 
                 style={{ backgroundImage: `url(${template.image})` }}
               />
-              <div className="p-4">
+              <CardContent className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{template.name}</h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  {template.description}
-                </p>
+                <p className="text-gray-400 text-sm mb-4">{template.description}</p>
                 <Button 
                   variant={selectedTemplate === template.id ? "default" : "outline"}
                   className="w-full"
                 >
                   {selectedTemplate === template.id ? "Selected" : "Select Template"}
                 </Button>
-              </div>
+              </CardContent>
             </Card>
           ))}
         </div>
@@ -184,22 +216,101 @@ const Templates = () => {
           <Card className="mt-10 border border-gray-700">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4">Customize Your Request</h2>
-              <p className="text-gray-400 mb-4">
-                Tell us what you'd like to change or customize in the template:
+              <p className="text-gray-400 mb-6">
+                Please provide your details and requirements for the website customization:
               </p>
-              <Textarea
-                value={requestDetails}
-                onChange={(e) => setRequestDetails(e.target.value)}
-                placeholder="Example: I'd like to have my business logo in the header, change the color scheme to blue, and add a contact form with 3 fields..."
-                className="min-h-[150px] mb-4"
-              />
-              <div className="flex justify-end">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Input
+                      id="fullName"
+                      value={formData.fullName}
+                      onChange={(e) => handleFormInput("fullName", e.target.value)}
+                      placeholder="John Doe"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email Address *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleFormInput("email", e.target.value)}
+                      placeholder="john@example.com"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleFormInput("phone", e.target.value)}
+                      placeholder="+1 (555) 000-0000"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="companyName">Company Name (Optional)</Label>
+                    <Input
+                      id="companyName"
+                      value={formData.companyName}
+                      onChange={(e) => handleFormInput("companyName", e.target.value)}
+                      placeholder="Your Company Ltd."
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="preferredColor">Preferred Color Scheme (Optional)</Label>
+                    <Input
+                      id="preferredColor"
+                      value={formData.preferredColor}
+                      onChange={(e) => handleFormInput("preferredColor", e.target.value)}
+                      placeholder="e.g., Blue and White"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="deadline">Expected Deadline (Optional)</Label>
+                    <Input
+                      id="deadline"
+                      value={formData.deadline}
+                      onChange={(e) => handleFormInput("deadline", e.target.value)}
+                      placeholder="e.g., 2 weeks"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="budget">Budget Range (Optional)</Label>
+                    <Input
+                      id="budget"
+                      value={formData.budget}
+                      onChange={(e) => handleFormInput("budget", e.target.value)}
+                      placeholder="e.g., $500-1000"
+                    />
+                  </div>
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="requestDetails">Custom Requirements *</Label>
+                  <Textarea
+                    id="requestDetails"
+                    value={formData.requestDetails}
+                    onChange={(e) => handleFormInput("requestDetails", e.target.value)}
+                    placeholder="Please describe any specific features, functionalities, or design elements you'd like to include..."
+                    className="min-h-[150px] mb-4"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-6">
                 <Button 
                   onClick={handleSubmitRequest} 
-                  disabled={isSubmitting || !requestDetails.trim()} 
+                  disabled={isSubmitting || !formData.fullName || !formData.email || !formData.phone || !formData.requestDetails} 
                   className="flex items-center"
                 >
-                  Submit Request
+                  {isSubmitting ? "Submitting..." : "Submit Request"}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>

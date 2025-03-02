@@ -3,7 +3,14 @@ import { Auth as SupabaseAuth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 
-export const Auth = ({ supabaseClient = supabase, ...props }) => {
+interface AuthProps {
+  supabaseClient?: typeof supabase;
+  appearance?: any;
+  providers?: string[];
+  [key: string]: any;
+}
+
+export const Auth = ({ supabaseClient = supabase, ...props }: AuthProps) => {
   return (
     <SupabaseAuth
       supabaseClient={supabaseClient}

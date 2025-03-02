@@ -1,15 +1,17 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Filter, ChevronRight } from "lucide-react";
+import { Filter, ChevronRight, Eye } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { TemplatePreviewModal } from "@/components/templates/TemplatePreviewModal";
+import { AuthModal } from "@/components/templates/AuthModal";
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -26,6 +28,11 @@ const Templates = () => {
     budget: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTemplateName, setPreviewTemplateName] = useState("");
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
+  const [loadingSession, setLoadingSession] = useState(true);
 
   const styles = [
     { id: "all", name: "All Styles" },
@@ -80,11 +87,35 @@ const Templates = () => {
     },
   ];
 
+  // Check authentication status
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      setSession(currentSession);
+      setLoadingSession(false);
+    };
+    
+    checkSession();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+    
+    return () => subscription.unsubscribe();
+  }, []);
+
   const filteredTemplates = selectedStyle === "all" 
     ? templates 
     : templates.filter(template => template.style === selectedStyle);
 
   const handleTemplateSelect = (templateId: number) => {
+    // If the user isn't signed in, show the auth modal
+    if (!session) {
+      setSelectedTemplate(templateId);
+      setIsAuthModalOpen(true);
+      return;
+    }
+    
     setSelectedTemplate(templateId === selectedTemplate ? null : templateId);
   };
 
@@ -92,19 +123,18 @@ const Templates = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handlePreviewTemplate = (templateName: string) => {
+    setPreviewTemplateName(templateName);
+    setIsPreviewOpen(true);
+  };
+
   const handleSubmitRequest = async () => {
     try {
       setIsSubmitting(true);
       
-      const { data: { session } } = await supabase.auth.getSession();
-      
       if (!session?.user) {
-        localStorage.setItem('pendingTemplateRequest', JSON.stringify({
-          templateId: selectedTemplate,
-          formData
-        }));
-        toast.info("Please create an account to submit your request");
-        navigate("/auth/signup");
+        toast.error("Please sign in to submit your request");
+        setIsAuthModalOpen(true);
         return;
       }
 
@@ -156,7 +186,7 @@ ${formData.requestDetails}
         budget: ""
       });
       setSelectedTemplate(null);
-      navigate("/requests");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error submitting request:", error);
       toast.error("Failed to submit your request. Please try again.");
@@ -164,6 +194,16 @@ ${formData.requestDetails}
       setIsSubmitting(false);
     }
   };
+
+  if (loadingSession) {
+    return (
+      <MainLayout>
+        <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
+          <div className="animate-pulse text-xl">Loading...</div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -191,22 +231,33 @@ ${formData.requestDetails}
           {filteredTemplates.map((template) => (
             <Card 
               key={template.id} 
-              className={`overflow-hidden transition-all cursor-pointer ${selectedTemplate === template.id ? 'ring-2 ring-primary' : ''}`}
-              onClick={() => handleTemplateSelect(template.id)}
+              className={`overflow-hidden transition-all ${selectedTemplate === template.id ? 'ring-2 ring-primary' : ''}`}
             >
               <div 
-                className="aspect-video bg-gray-800 bg-center bg-cover" 
+                className="aspect-video bg-gray-800 bg-center bg-cover cursor-pointer" 
                 style={{ backgroundImage: `url(${template.image})` }}
+                onClick={() => handlePreviewTemplate(template.name)}
               />
               <CardContent className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{template.name}</h3>
                 <p className="text-gray-400 text-sm mb-4">{template.description}</p>
-                <Button 
-                  variant={selectedTemplate === template.id ? "default" : "outline"}
-                  className="w-full"
-                >
-                  {selectedTemplate === template.id ? "Selected" : "Select Template"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => handlePreviewTemplate(template.name)}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Preview
+                  </Button>
+                  <Button 
+                    variant={selectedTemplate === template.id ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => handleTemplateSelect(template.id)}
+                  >
+                    {selectedTemplate === template.id ? "Selected" : "Select Template"}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -317,6 +368,24 @@ ${formData.requestDetails}
             </CardContent>
           </Card>
         )}
+
+        <TemplatePreviewModal 
+          open={isPreviewOpen} 
+          onOpenChange={setIsPreviewOpen}
+          templateName={previewTemplateName}
+        />
+
+        <AuthModal 
+          open={isAuthModalOpen} 
+          onOpenChange={setIsAuthModalOpen}
+          onSuccess={() => {
+            setIsAuthModalOpen(false);
+            // Reselect the template after successful authentication
+            if (selectedTemplate) {
+              setSelectedTemplate(selectedTemplate);
+            }
+          }}
+        />
       </div>
     </MainLayout>
   );

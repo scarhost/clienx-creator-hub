@@ -10,11 +10,10 @@ interface AuthProps {
   [key: string]: any;
 }
 
-export const Auth = ({ supabaseClient = supabase, ...props }: AuthProps) => {
+export const Auth = ({ supabaseClient = supabase, appearance, ...props }: AuthProps) => {
   return (
     <SupabaseAuth
       supabaseClient={supabaseClient}
-      {...props}
       providers={[]} // Empty providers array removes all social logins
       appearance={{
         theme: ThemeSupa,
@@ -33,8 +32,9 @@ export const Auth = ({ supabaseClient = supabase, ...props }: AuthProps) => {
             },
           }
         },
-        ...props.appearance
+        ...appearance
       }}
+      {...props}
     />
   );
 };

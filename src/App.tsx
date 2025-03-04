@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Templates from "./pages/Templates";
@@ -10,6 +11,7 @@ import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import Dashboard from "./pages/Dashboard";
 import UserRequests from "./pages/UserRequests";
+import AdminDashboard from "./pages/AdminDashboard";
 import { Toaster } from "sonner";
 
 function App() {
@@ -27,6 +29,7 @@ function App() {
         <Route path="/auth/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/requests" element={<UserRequests />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
       <Toaster />
     </>

@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { TemplatePreviewModal } from "@/components/templates/TemplatePreviewModal";
 import { AuthModal } from "@/components/templates/AuthModal";
 import { TemplateCard } from "@/components/templates/TemplateCard";
-import { RequestForm } from "@/components/templates/RequestForm";
+import { RequestFormDialog } from "@/components/templates/RequestFormDialog";
+import { Button } from "@/components/ui/button";
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const Templates = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewTemplateName, setPreviewTemplateName] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [loadingSession, setLoadingSession] = useState(true);
 
@@ -113,7 +115,8 @@ const Templates = () => {
       return;
     }
     
-    setSelectedTemplate(templateId === selectedTemplate ? null : templateId);
+    setSelectedTemplate(templateId);
+    setIsRequestFormOpen(true);
   };
 
   const handleFormInput = (field: string, value: string) => {
@@ -183,6 +186,7 @@ ${formData.requestDetails}
         budget: ""
       });
       setSelectedTemplate(null);
+      setIsRequestFormOpen(false);
       navigate("/dashboard");
     } catch (error) {
       console.error("Error submitting request:", error);
@@ -236,15 +240,6 @@ ${formData.requestDetails}
           ))}
         </div>
 
-        {selectedTemplate && (
-          <RequestForm
-            formData={formData}
-            handleFormInput={handleFormInput}
-            handleSubmitRequest={handleSubmitRequest}
-            isSubmitting={isSubmitting}
-          />
-        )}
-
         <TemplatePreviewModal 
           open={isPreviewOpen} 
           onOpenChange={setIsPreviewOpen}
@@ -258,9 +253,18 @@ ${formData.requestDetails}
             setIsAuthModalOpen(false);
             // Reselect the template after successful authentication
             if (selectedTemplate) {
-              setSelectedTemplate(selectedTemplate);
+              setIsRequestFormOpen(true);
             }
           }}
+        />
+
+        <RequestFormDialog
+          open={isRequestFormOpen}
+          onOpenChange={setIsRequestFormOpen}
+          formData={formData}
+          handleFormInput={handleFormInput}
+          handleSubmitRequest={handleSubmitRequest}
+          isSubmitting={isSubmitting}
         />
       </div>
     </MainLayout>

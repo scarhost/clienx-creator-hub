@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Crown, Eye, Clock } from "lucide-react";
+import { Pencil, Crown, Eye, Clock, ExternalLink, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
 interface WebsiteRequest {
@@ -14,6 +14,8 @@ interface WebsiteRequest {
   template_style: string;
   status: string;
   created_at: string;
+  admin_notes?: string;
+  updated_at?: string;
 }
 
 const Dashboard = () => {
@@ -60,6 +62,36 @@ const Dashboard = () => {
     });
   };
 
+  // Extract updates from admin notes
+  const extractUpdates = (notes?: string) => {
+    if (!notes) return [];
+    
+    const updates: {date: string, message: string}[] = [];
+    const updateRegex = /\[UPDATE ([^\]]+)\]: (.+?)(?=\n\[UPDATE|$)/gs;
+    
+    let match;
+    while ((match = updateRegex.exec(notes)) !== null) {
+      updates.push({
+        date: match[1],
+        message: match[2].trim()
+      });
+    }
+    
+    return updates.reverse(); // Most recent first
+  };
+  
+  // Parse website link from admin notes
+  const getWebsiteLink = (notes?: string) => {
+    if (!notes) return null;
+    
+    // This is a simple implementation - might need to be more sophisticated
+    // based on how admins actually format the website links
+    const linkRegex = /(https?:\/\/[^\s]+)/g;
+    const match = linkRegex.exec(notes);
+    
+    return match ? match[0] : null;
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
@@ -95,7 +127,8 @@ const Dashboard = () => {
                         <div className="flex items-center gap-2 mt-2">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             request.status === 'pending' ? 'bg-yellow-800 text-yellow-100' :
-                            request.status === 'approved' ? 'bg-green-800 text-green-100' :
+                            request.status === 'in_progress' ? 'bg-blue-800 text-blue-100' :
+                            request.status === 'completed' ? 'bg-green-800 text-green-100' :
                             request.status === 'rejected' ? 'bg-red-800 text-red-100' :
                             'bg-blue-800 text-blue-100'
                           }`}>
@@ -106,6 +139,19 @@ const Dashboard = () => {
                             {request.template_style.charAt(0).toUpperCase() + request.template_style.slice(1)}
                           </span>
                         </div>
+                        
+                        {/* Website Link */}
+                        {getWebsiteLink(request.admin_notes) && (
+                          <a 
+                            href={getWebsiteLink(request.admin_notes) || '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center mt-3 text-sm text-primary hover:underline"
+                          >
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            View Your Website
+                          </a>
+                        )}
                       </div>
                     </div>
                     <div className="mt-4 flex gap-2">
@@ -147,6 +193,49 @@ const Dashboard = () => {
                 </Button>
               </div>
             </div>
+          </Card>
+
+          {/* Developer Updates */}
+          <Card className="p-6 md:col-span-2">
+            <h2 className="text-xl font-semibold mb-4">
+              <div className="flex items-center">
+                <MessageSquare className="w-5 h-5 mr-2 text-primary" />
+                Developer Updates
+              </div>
+            </h2>
+            
+            {loading ? (
+              <div className="text-center py-8 text-gray-400">Loading updates...</div>
+            ) : userRequests.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <p>No updates available yet. Submit a website request to get started.</p>
+              </div>
+            ) : (
+              <div>
+                {userRequests.some(request => extractUpdates(request.admin_notes).length > 0) ? (
+                  <div className="space-y-5">
+                    {userRequests
+                      .filter(request => extractUpdates(request.admin_notes).length > 0)
+                      .map(request => (
+                        <div key={request.id} className="border-l-2 border-primary/50 pl-4">
+                          <p className="font-medium text-base mb-2">{request.template_name}</p>
+                          {extractUpdates(request.admin_notes).map((update, idx) => (
+                            <div key={idx} className="mb-3">
+                              <p className="text-sm text-gray-400">{update.date}</p>
+                              <p className="text-sm">{update.message}</p>
+                            </div>
+                          ))}
+                        </div>
+                      ))
+                    }
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <p>No updates available yet. Our developers will post updates here as they work on your website.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </Card>
 
           {/* Customization Request Form */}

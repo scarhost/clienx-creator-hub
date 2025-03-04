@@ -12,6 +12,13 @@ import SignUp from "./pages/auth/SignUp";
 import Dashboard from "./pages/Dashboard";
 import UserRequests from "./pages/UserRequests";
 import AdminDashboard from "./pages/AdminDashboard";
+import About from "./pages/About";
+import Features from "./pages/Features";
+import Contact from "./pages/Contact";
+import Blog from "./pages/Blog";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Pricing from "./pages/Pricing";
 import { Toaster } from "sonner";
 
 function App() {
@@ -30,6 +37,13 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/requests" element={<UserRequests />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/pricing" element={<Pricing />} />
       </Routes>
       <Toaster />
     </>

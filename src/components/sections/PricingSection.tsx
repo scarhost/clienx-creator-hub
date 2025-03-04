@@ -12,14 +12,14 @@ export const PricingSection = () => {
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
         <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
-          Choose a plan that best suits your needs. All plans include access to our template library and personalized support.
+          Choose a plan that best suits your needs. All plans include a personalized website built for your requirements.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <Card 
               key={index} 
               className={`p-6 bg-gray-900/50 border transition-all duration-300 hover:transform hover:-translate-y-1 ${
-                plan.name === "Professional" 
+                plan.name === "Standard" 
                   ? "relative before:absolute before:inset-0 before:rounded-lg before:p-[1px] before:bg-gradient-to-r before:from-primary-400 before:to-accent before:-z-10 before:animate-pulse" 
                   : "border-gray-800"
               }`}
@@ -35,8 +35,9 @@ export const PricingSection = () => {
                   </li>
                 ))}
               </ul>
+              <div className="text-sm text-gray-400 mb-4">Setup Fee: {plan.setupFee}</div>
               <Button 
-                className={`w-full ${plan.name === "Professional" ? "bg-primary hover:bg-primary/90" : ""}`}
+                className={`w-full ${plan.name === "Standard" ? "bg-primary hover:bg-primary/90" : ""}`}
                 onClick={() => navigate("/templates")}
               >
                 Get Started
@@ -51,42 +52,46 @@ export const PricingSection = () => {
 
 const plans = [
   {
-    name: "Basic",
-    price: "$499",
-    description: "Perfect for small businesses getting started",
+    name: "Starter",
+    price: "$10-$20/mo",
+    description: "Perfect for simple personal sites",
+    setupFee: "$50-$100",
     features: [
-      "Choose from basic templates",
-      "1 week delivery time",
-      "Basic customization options",
-      "3 revision rounds",
-      "Email support"
+      "1-3 pages included",
+      "Domain & hosting not included",
+      "Basic text updates monthly",
+      "Mobile responsive design",
+      "Contact form",
+      "No e-commerce features"
     ]
   },
   {
-    name: "Professional",
-    price: "$999",
-    description: "Best for growing businesses",
+    name: "Standard",
+    price: "$30-$50/mo",
+    description: "Best for small businesses",
+    setupFee: "$50-$100",
     features: [
-      "All templates available",
-      "3-5 days delivery time",
-      "Advanced customization",
-      "Unlimited revisions",
-      "Priority email & phone support",
-      "SEO optimization"
+      "5-10 pages included",
+      "Domain & hosting included",
+      "Basic SEO optimization",
+      "Text & image updates monthly",
+      "Basic e-commerce (if needed)",
+      "Social media integration"
     ]
   },
   {
-    name: "Enterprise",
-    price: "Custom",
-    description: "For large businesses with specific needs",
+    name: "Pro E-commerce",
+    price: "$80-$150/mo",
+    description: "For online stores & businesses",
+    setupFee: "$50-$100",
     features: [
-      "Custom template design",
-      "1-2 days delivery time",
-      "Full customization options",
-      "Unlimited revisions",
-      "24/7 priority support",
-      "SEO & Marketing setup",
-      "Analytics integration"
+      "Unlimited pages",
+      "Domain & hosting included",
+      "Full SEO optimization",
+      "Full support & updates",
+      "Complete online store",
+      "Product management system",
+      "Payment processing"
     ]
   }
 ];

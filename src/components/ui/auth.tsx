@@ -1,20 +1,21 @@
 
 import { Auth as SupabaseAuth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { Provider } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuthProps {
   supabaseClient?: typeof supabase;
   appearance?: any;
-  providers?: string[];
+  providers?: Provider[];
   [key: string]: any;
 }
 
-export const Auth = ({ supabaseClient = supabase, appearance, ...props }: AuthProps) => {
+export const Auth = ({ supabaseClient = supabase, appearance, providers = [], ...props }: AuthProps) => {
   return (
     <SupabaseAuth
       supabaseClient={supabaseClient}
-      providers={[]} // Empty providers array removes all social logins
+      providers={providers}
       appearance={{
         theme: ThemeSupa,
         variables: {

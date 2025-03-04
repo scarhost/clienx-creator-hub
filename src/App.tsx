@@ -19,6 +19,9 @@ import Blog from "./pages/Blog";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Pricing from "./pages/Pricing";
+import StarterPlan from "./pages/Plans/StarterPlan";
+import StandardPlan from "./pages/Plans/StandardPlan";
+import ProEcommercePlan from "./pages/Plans/ProEcommercePlan";
 import { Toaster } from "sonner";
 
 function App() {
@@ -44,6 +47,9 @@ function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/plans/starter" element={<StarterPlan />} />
+        <Route path="/plans/standard" element={<StandardPlan />} />
+        <Route path="/plans/pro-ecommerce" element={<ProEcommercePlan />} />
       </Routes>
       <Toaster />
     </>

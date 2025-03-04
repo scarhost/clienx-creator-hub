@@ -30,7 +30,7 @@ export const PricingSection = () => {
                   key={index}
                   plan={plan}
                   isHighlighted={plan.name === "Standard"}
-                  onGetStarted={() => navigate("/templates")}
+                  onGetStarted={() => navigate(plan.detailPage)}
                 />
               ))}
             </div>
@@ -47,7 +47,7 @@ export const PricingSection = () => {
                   key={index}
                   plan={plan}
                   isHighlighted={plan.name === "Standard"}
-                  onGetStarted={() => navigate("/templates")}
+                  onGetStarted={() => navigate(plan.detailPage)}
                 />
               ))}
             </div>
@@ -108,6 +108,7 @@ interface PricingPlan {
   features: string[];
   setupFee?: string;
   highlightFeature?: string;
+  detailPage: string;
 }
 
 const PricingCard = ({ 
@@ -173,7 +174,8 @@ const monthlyPlans: PricingPlan[] = [
       "Contact form",
       "Basic SEO"
     ],
-    highlightFeature: "Pay $5 per additional update"
+    highlightFeature: "Pay $5 per additional update",
+    detailPage: "/plans/starter"
   },
   {
     name: "Standard",
@@ -187,7 +189,8 @@ const monthlyPlans: PricingPlan[] = [
       "Monthly text & image updates",
       "Basic e-commerce (if needed)",
       "Social media integration"
-    ]
+    ],
+    detailPage: "/plans/standard"
   },
   {
     name: "Pro E-commerce",
@@ -202,7 +205,8 @@ const monthlyPlans: PricingPlan[] = [
       "Complete online store",
       "Product management system",
       "Payment processing"
-    ]
+    ],
+    detailPage: "/plans/pro-ecommerce"
   }
 ];
 
@@ -218,7 +222,8 @@ const oneTimePlans: PricingPlan[] = [
       "Mobile responsive design",
       "Basic design",
       "No ongoing support included"
-    ]
+    ],
+    detailPage: "/plans/starter"
   },
   {
     name: "Standard",
@@ -231,7 +236,8 @@ const oneTimePlans: PricingPlan[] = [
       "Mobile responsive design",
       "Professional design",
       "No ongoing support included"
-    ]
+    ],
+    detailPage: "/plans/standard"
   },
   {
     name: "Pro E-commerce",
@@ -244,6 +250,7 @@ const oneTimePlans: PricingPlan[] = [
       "Full product management system",
       "Payment gateway integration",
       "No ongoing support included"
-    ]
+    ],
+    detailPage: "/plans/pro-ecommerce"
   }
 ];

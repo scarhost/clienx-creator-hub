@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +26,6 @@ const Dashboard = () => {
   const [userPlan, setUserPlan] = useState<'starter' | 'standard' | 'pro-ecommerce'>('starter');
   const [usedRequests, setUsedRequests] = useState(0);
 
-  // Get monthly request limit based on plan
   const getMonthlyRequestLimit = () => {
     switch (userPlan) {
       case 'starter':
@@ -41,7 +39,6 @@ const Dashboard = () => {
     }
   };
 
-  // Check if the user can make customization requests based on their plan
   const canRequestCustomization = () => {
     return userPlan === 'standard' || userPlan === 'pro-ecommerce';
   };
@@ -56,7 +53,6 @@ const Dashboard = () => {
 
       try {
         setLoading(true);
-        // Fetch the user's website requests
         const { data, error } = await supabase
           .from("website_requests")
           .select("*")
@@ -66,11 +62,8 @@ const Dashboard = () => {
         if (error) throw error;
         setUserRequests(data || []);
         
-        // For demo purposes, we'll use a fixed plan type
-        // In a real app, this would come from the user's subscription data
         setUserPlan('starter');
         
-        // Count requests made in the current month (demo)
         const currentMonthRequests = (data || []).filter(req => {
           const requestDate = new Date(req.created_at);
           const currentDate = new Date();
@@ -113,14 +106,12 @@ const Dashboard = () => {
       });
     }
     
-    return updates.reverse(); // Most recent first
+    return updates.reverse();
   };
   
   const getWebsiteLink = (notes?: string) => {
     if (!notes) return null;
     
-    // This is a simple implementation - might need to be more sophisticated
-    // based on how admins actually format the website links
     const linkRegex = /(https?:\/\/[^\s]+)/g;
     const match = linkRegex.exec(notes);
     
@@ -215,7 +206,10 @@ const Dashboard = () => {
                 <span className="text-sm">Monthly Update Requests</span>
                 <span className="text-sm font-medium">{usedRequests} / {getMonthlyRequestLimit()} used</span>
               </div>
-              <Button className="w-full" onClick={() => navigate('/pricing')}>Upgrade Plan</Button>
+              <div className="grid grid-cols-2 gap-3">
+                <Button className="w-full" onClick={() => navigate('/pricing')}>View Plans</Button>
+                <Button className="w-full" variant="outline" onClick={() => navigate('/plans/selection')}>Change Plan</Button>
+              </div>
             </div>
             
             <div className="mt-6">
@@ -231,7 +225,7 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          <Card className="p-6 md:col-span-2">
+          <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">
               <div className="flex items-center">
                 <MessageSquare className="w-5 h-5 mr-2 text-primary" />
@@ -273,13 +267,13 @@ const Dashboard = () => {
             )}
           </Card>
 
-          <Card className="p-6 md:col-span-2">
+          <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Pay-Per-Update</h2>
             <SingleUpdateRequest planType={userPlan} />
           </Card>
 
           {canRequestCustomization() && (
-            <Card className="p-6 md:col-span-2">
+            <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Request Customization</h2>
               <form className="space-y-4">
                 <div>
@@ -318,7 +312,7 @@ const Dashboard = () => {
             </Card>
           )}
 
-          <Card className="p-6 md:col-span-2">
+          <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Pre-built Website Support</h2>
             <PreBuiltWebsiteSupport />
           </Card>

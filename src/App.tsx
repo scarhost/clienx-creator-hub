@@ -22,6 +22,7 @@ import Pricing from "./pages/Pricing";
 import StarterPlan from "./pages/Plans/StarterPlan";
 import StandardPlan from "./pages/Plans/StandardPlan";
 import ProEcommercePlan from "./pages/Plans/ProEcommercePlan";
+import PlanSelection from "./pages/Plans/PlanSelection";
 import { Toaster } from "sonner";
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
         <Route path="/plans/starter" element={<StarterPlan />} />
         <Route path="/plans/standard" element={<StandardPlan />} />
         <Route path="/plans/pro-ecommerce" element={<ProEcommercePlan />} />
+        <Route path="/plans/selection" element={<PlanSelection />} />
       </Routes>
       <Toaster />
     </>

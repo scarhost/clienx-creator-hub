@@ -30,7 +30,7 @@ export const PricingSection = () => {
                   key={index}
                   plan={plan}
                   isHighlighted={plan.name === "Standard"}
-                  onGetStarted={() => navigate(plan.detailPage)}
+                  onGetStarted={() => navigate('/plans/selection')}
                 />
               ))}
             </div>
@@ -47,7 +47,7 @@ export const PricingSection = () => {
                   key={index}
                   plan={plan}
                   isHighlighted={plan.name === "Standard"}
-                  onGetStarted={() => navigate(plan.detailPage)}
+                  onGetStarted={() => navigate('/plans/selection')}
                 />
               ))}
             </div>

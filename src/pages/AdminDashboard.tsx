@@ -4,7 +4,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Search, X, Edit, MessageSquare, User, Users, FileText } from "lucide-react";
+import { Check, Search, X, Edit, MessageSquare, User, Users, FileText, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";

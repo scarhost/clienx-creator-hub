@@ -1,199 +1,176 @@
 
 import { useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, HelpCircle, FileText } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Info, Upload, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog";
 
 export const PreBuiltWebsiteSupport = () => {
-  const [websiteUrl, setWebsiteUrl] = useState("");
-  const [featureType, setFeatureType] = useState("");
-  const [featureDetails, setFeatureDetails] = useState("");
+  const [selectedWebsite, setSelectedWebsite] = useState<string>("");
+  const [requestDetails, setRequestDetails] = useState<string>("");
+  const [googleDocsLink, setGoogleDocsLink] = useState<string>("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDocsDialog, setShowDocsDialog] = useState(false);
-  
-  // Get price based on feature complexity
-  const getFeaturePrice = () => {
-    switch (featureType) {
-      case "easy":
-        return 20;
-      case "medium":
-        return 35;
-      case "complex":
-        return 50;
-      default:
-        return 0;
-    }
-  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate request submission
+    // Simulate submission
     setTimeout(() => {
       setIsSubmitting(false);
-      toast.success("Feature request submitted successfully! We'll review and provide a quote based on complexity.");
-      setFeatureDetails("");
-      setWebsiteUrl("");
-      setFeatureType("");
+      toast.success("Support request submitted successfully!");
+      setRequestDetails("");
+      setSelectedWebsite("");
+      setGoogleDocsLink("");
     }, 1500);
   };
   
   return (
-    <Card className="border border-gray-800">
-      <CardContent className="pt-6">
-        <div className="mb-4">
-          <p className="text-sm text-gray-300 mb-3">
-            We can help customize your existing website with new features or changes, 
-            regardless of where it was built. Simply submit your request below and we'll review it.
-            Pricing will depend on complexity (typically $20-$50).
-          </p>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Google Docs Link</label>
-            <div className="relative">
-              <Input
-                type="url"
-                value={websiteUrl}
-                onChange={(e) => setWebsiteUrl(e.target.value)}
-                placeholder="https://docs.google.com/document/d/..."
-                required
-                onClick={() => setShowDocsDialog(true)}
+    <>
+      <Card className="border border-gray-800">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-semibold">Pre-Built Website Support</CardTitle>
+              <CardDescription>
+                Request support for your existing website (not built by us)
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Website Type</label>
+              <Select value={selectedWebsite} onValueChange={setSelectedWebsite}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select your website platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wordpress">WordPress</SelectItem>
+                  <SelectItem value="shopify">Shopify</SelectItem>
+                  <SelectItem value="wix">Wix</SelectItem>
+                  <SelectItem value="squarespace">Squarespace</SelectItem>
+                  <SelectItem value="webflow">Webflow</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Support Details</label>
+              <Textarea 
+                value={requestDetails}
+                onChange={(e) => setRequestDetails(e.target.value)}
+                placeholder="Describe what you need help with on your website..."
+                className="h-24"
               />
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="sm" 
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400"
-                onClick={() => setShowDocsDialog(true)}
-              >
-                <FileText className="w-4 h-4" />
-              </Button>
             </div>
-            <p className="text-xs text-gray-400">
-              Please share a Google Docs document with your website details and requirements
-            </p>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <label className="text-sm font-medium">Feature Complexity</label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" className="h-4 w-4 p-0 ml-1">
-                      <HelpCircle className="h-3 w-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs max-w-[250px]">
-                      Easy: Simple text/image changes<br />
-                      Medium: New pages or form functionality<br />
-                      Complex: Interactive features or integrations
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Google Docs Link (optional)</label>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-7 text-xs text-primary"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  <Info className="h-3 w-3 mr-1" />
+                  How to share Google Docs?
+                </Button>
+              </div>
+              <Input
+                value={googleDocsLink}
+                onChange={(e) => setGoogleDocsLink(e.target.value)}
+                placeholder="https://docs.google.com/document/d/..."
+              />
             </div>
-            <Select value={featureType} onValueChange={setFeatureType}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select expected complexity level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="easy">Easy (approx. $20)</SelectItem>
-                <SelectItem value="medium">Medium (approx. $35)</SelectItem>
-                <SelectItem value="complex">Complex (approx. $50)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Feature Details</label>
-            <Textarea 
-              value={featureDetails}
-              onChange={(e) => setFeatureDetails(e.target.value)}
-              placeholder="Describe in detail what you'd like us to add or change on your existing website..."
-              className="h-32"
-              required
-            />
-          </div>
-          
-          <div className="pt-4">
-            <Button 
-              type="submit"
-              disabled={!websiteUrl || !featureType || !featureDetails || isSubmitting}
-              className="w-full"
-            >
-              {isSubmitting ? (
-                <>Submitting Request...</>
-              ) : (
-                <>
-                  Submit Request
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-center mt-2 text-gray-400">
-              There's no charge to submit a request. We'll review and provide a quote based on complexity.
-            </p>
-          </div>
-        </form>
-      </CardContent>
-
-      <Dialog open={showDocsDialog} onOpenChange={setShowDocsDialog}>
-        <DialogContent className="sm:max-w-md">
+            
+            <div className="pt-2">
+              <div className="rounded-md p-3 bg-primary/10 border border-primary/20">
+                <p className="text-sm font-medium mb-1">Pricing Information</p>
+                <p className="text-xs text-gray-400">
+                  • Submission is free - we'll assess your request and provide a quote
+                </p>
+                <p className="text-xs text-gray-400">
+                  • Simple changes typically cost $20-30
+                </p>
+                <p className="text-xs text-gray-400">
+                  • Complex features or customizations may cost $40-50
+                </p>
+                <p className="text-xs text-gray-400">
+                  • You'll only pay if you approve our quote
+                </p>
+              </div>
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            disabled={!selectedWebsite || !requestDetails || isSubmitting}
+            onClick={handleSubmit}
+            className="w-full"
+          >
+            {isSubmitting ? (
+              <>Processing Submission...</>
+            ) : (
+              <>Submit Support Request</>
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
+      
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>How to Share Google Docs</DialogTitle>
             <DialogDescription>
-              Follow these steps to properly share your Google Docs document with us.
+              Follow these steps to create and share a Google Doc with your website details
             </DialogDescription>
           </DialogHeader>
+          
           <div className="space-y-4 py-4">
-            <div className="space-y-1">
+            <div className="space-y-2">
               <h3 className="text-sm font-medium">1. Create a Google Doc</h3>
               <p className="text-sm text-gray-400">
-                Create a new Google Docs document with all your website details, screenshots, and specific requirements.
+                Go to <a href="https://docs.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">docs.google.com</a> and create a new document
               </p>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium">2. Set Sharing Permissions</h3>
+            
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">2. Add necessary information</h3>
               <p className="text-sm text-gray-400">
-                Click "Share" in the top right, then change access to "Anyone with the link" and set to "Editor" so we can add comments.
+                Include your website URL, credentials (if needed), screenshots, and detailed instructions
               </p>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium">3. Copy and Share the Link</h3>
+            
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">3. Share your document</h3>
               <p className="text-sm text-gray-400">
-                Copy the link from the sharing dialog and paste it in the field above.
+                Click the "Share" button in the top right, then:
               </p>
+              <ul className="list-disc pl-5 text-sm text-gray-400">
+                <li>Change access to "Anyone with the link"</li>
+                <li>Set permission to "Editor" if you want us to add comments</li>
+                <li>Copy the link and paste it in the form</li>
+              </ul>
             </div>
           </div>
-          <div className="flex justify-end">
-            <DialogClose asChild>
-              <Button variant="default">Got it</Button>
-            </DialogClose>
-          </div>
+          
+          <DialogFooter>
+            <Button onClick={() => setIsDialogOpen(false)}>
+              Got it
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Card>
+    </>
   );
 };

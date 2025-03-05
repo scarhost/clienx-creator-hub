@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogHeader } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Auth } from "@/components/ui/auth";
@@ -16,6 +16,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onOpenChange,
   onSuccess
 }) => {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") {
+        // Close modal and call onSuccess when signed in
+        onOpenChange(false);
+        onSuccess();
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [onOpenChange, onSuccess]);
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -9,7 +8,6 @@ import { TemplatePreviewModal } from "@/components/templates/TemplatePreviewModa
 import { AuthModal } from "@/components/templates/AuthModal";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { RequestFormDialog } from "@/components/templates/RequestFormDialog";
-import { Button } from "@/components/ui/button";
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -86,7 +84,6 @@ const Templates = () => {
     },
   ];
 
-  // Check authentication status
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
@@ -108,9 +105,9 @@ const Templates = () => {
     : templates.filter(template => template.style === selectedStyle);
 
   const handleTemplateSelect = (templateId: number) => {
-    // If the user isn't signed in, show the auth modal
     if (!session) {
       setSelectedTemplate(templateId);
+      localStorage.setItem('pendingTemplateRequest', templateId.toString());
       setIsAuthModalOpen(true);
       return;
     }
@@ -251,10 +248,6 @@ ${formData.requestDetails}
           onOpenChange={setIsAuthModalOpen}
           onSuccess={() => {
             setIsAuthModalOpen(false);
-            // Reselect the template after successful authentication
-            if (selectedTemplate) {
-              setIsRequestFormOpen(true);
-            }
           }}
         />
 

@@ -1,11 +1,11 @@
+
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { toast } from "sonner";
+import { Auth } from "@/components/ui/auth";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -13,6 +13,13 @@ const SignIn = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
+        const pendingTemplateRequest = localStorage.getItem('pendingTemplateRequest');
+        if (pendingTemplateRequest) {
+          localStorage.removeItem('pendingTemplateRequest');
+          navigate('/templates');
+          return;
+        }
+        
         // Check if user has any websites
         const { data: websites } = await supabase
           .from("website_info")
@@ -53,22 +60,7 @@ const SignIn = () => {
             supabaseClient={supabase}
             view="sign_in"
             appearance={{ 
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: 'rgb(79, 70, 229)',
-                    brandAccent: 'rgb(67, 56, 202)',
-                    brandButtonText: 'white',
-                    defaultButtonBackground: 'rgb(17, 24, 39)',
-                    defaultButtonBackgroundHover: 'rgb(31, 41, 55)',
-                    inputBackground: 'transparent',
-                    inputBorder: 'rgb(75, 85, 99)',
-                    inputBorderHover: 'rgb(107, 114, 128)',
-                    inputBorderFocus: 'rgb(79, 70, 229)',
-                  },
-                }
-              },
+              extend: false,
               className: {
                 container: 'space-y-4',
                 button: 'bg-primary hover:bg-primary-600 text-white px-4 py-2 rounded-lg w-full',
@@ -78,6 +70,16 @@ const SignIn = () => {
             }}
             providers={[]}
           />
+          
+          <div className="mt-6 text-center">
+            <span className="text-gray-400">Don't have an account?</span>{" "}
+            <Link
+              to="/auth/signup"
+              className="text-primary hover:underline"
+            >
+              Sign up
+            </Link>
+          </div>
         </Card>
       </div>
     </MainLayout>

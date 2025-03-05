@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pencil, Crown, Eye, Clock, ExternalLink, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { SingleUpdateRequest } from "@/components/dashboard/SingleUpdateRequest";
 
 interface WebsiteRequest {
   id: string;
@@ -22,6 +22,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [userRequests, setUserRequests] = useState<WebsiteRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userPlan, setUserPlan] = useState<'starter' | 'standard' | 'pro-ecommerce'>('starter');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -42,6 +43,10 @@ const Dashboard = () => {
         
         if (error) throw error;
         setUserRequests(data || []);
+        
+        // For demo purposes, we'll use a fixed plan type
+        // In a real app, this would come from the user's subscription data
+        setUserPlan('starter');
       } catch (error) {
         console.error("Error fetching website requests:", error);
         toast.error("Failed to load your website requests");
@@ -62,7 +67,6 @@ const Dashboard = () => {
     });
   };
 
-  // Extract updates from admin notes
   const extractUpdates = (notes?: string) => {
     if (!notes) return [];
     
@@ -80,7 +84,6 @@ const Dashboard = () => {
     return updates.reverse(); // Most recent first
   };
   
-  // Parse website link from admin notes
   const getWebsiteLink = (notes?: string) => {
     if (!notes) return null;
     
@@ -98,7 +101,6 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
         
         <div className="grid gap-8 md:grid-cols-2">
-          {/* Websites Section */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Your Website Requests</h2>
             <div className="space-y-4">
@@ -140,7 +142,6 @@ const Dashboard = () => {
                           </span>
                         </div>
                         
-                        {/* Website Link */}
                         {getWebsiteLink(request.admin_notes) && (
                           <a 
                             href={getWebsiteLink(request.admin_notes) || '#'} 
@@ -170,16 +171,15 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          {/* Plan Section */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Your Plan</h2>
             <div className="p-4 border border-primary/20 rounded-lg bg-primary/5">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="h-5 w-5 text-primary" />
-                <p className="text-lg font-medium">Free Plan</p>
+                <p className="text-lg font-medium">{userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan</p>
               </div>
               <p className="text-sm text-gray-400 mb-4">Access to basic features</p>
-              <Button className="w-full">Upgrade Plan</Button>
+              <Button className="w-full" onClick={() => navigate('/pricing')}>Upgrade Plan</Button>
             </div>
             
             <div className="mt-6">
@@ -195,7 +195,6 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          {/* Developer Updates */}
           <Card className="p-6 md:col-span-2">
             <h2 className="text-xl font-semibold mb-4">
               <div className="flex items-center">
@@ -238,7 +237,11 @@ const Dashboard = () => {
             )}
           </Card>
 
-          {/* Customization Request Form */}
+          <Card className="p-6 md:col-span-2">
+            <h2 className="text-xl font-semibold mb-4">Pay-Per-Update</h2>
+            <SingleUpdateRequest planType={userPlan} />
+          </Card>
+
           <Card className="p-6 md:col-span-2">
             <h2 className="text-xl font-semibold mb-4">Request Customization</h2>
             <form className="space-y-4">

@@ -43,7 +43,7 @@ const ProEcommercePlan = () => {
                 </li>
                 <li className="flex items-start text-gray-300">
                   <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
-                  <span>Unlimited updates and support</span>
+                  <span>10 updates per month included</span>
                 </li>
                 <li className="flex items-start text-gray-300">
                   <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
@@ -52,6 +52,26 @@ const ProEcommercePlan = () => {
                 <li className="flex items-start text-gray-300">
                   <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
                   <span>Advanced product management system</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
+                  <span>Website customization requests</span>
+                </li>
+              </ul>
+              
+              <h3 className="text-xl font-medium mb-3 mt-8">Update & Support Options</h3>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start text-gray-300">
+                  <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
+                  <span>10 updates per month included</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
+                  <span>Pay-per-update: $5 per additional update</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
+                  <span>Pre-built website support: $20-50 per feature (based on complexity)</span>
                 </li>
               </ul>
               
@@ -115,6 +135,10 @@ const ProEcommercePlan = () => {
                 <div className="text-4xl font-bold mb-2">$80-$150/mo</div>
                 <div className="text-sm text-gray-400 mb-4">+ $69.99 setup fee</div>
                 <p className="text-gray-400 mb-6">For online stores & businesses</p>
+                
+                <div className="bg-primary-400/10 text-primary-400 px-3 py-2 rounded-md text-sm mb-6 font-medium">
+                  10 updates/month included
+                </div>
                 
                 <Button 
                   className="w-full bg-primary hover:bg-primary/90 mb-4"

@@ -86,11 +86,15 @@ export const PricingSection = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-primary-400 mr-2">•</span>
-                  Pay-per-update: $5 per simple change
+                  Standard: 10 updates/month included
                 </li>
                 <li className="flex items-start">
                   <span className="text-primary-400 mr-2">•</span>
-                  Pro: Unlimited updates included
+                  All plans: Pay $5 per additional update
+                </li>
+                <li className="flex items-start">
+                  <span className="text-primary-400 mr-2">•</span>
+                  Pre-built website support: $20-50 per feature
                 </li>
               </ul>
             </div>
@@ -185,11 +189,12 @@ const monthlyPlans: PricingPlan[] = [
     features: [
       "5-10 pages included",
       "Domain & hosting included",
+      "10 monthly updates included",
       "Basic SEO optimization",
-      "Monthly text & image updates",
       "Basic e-commerce (if needed)",
       "Social media integration"
     ],
+    highlightFeature: "Pay $5 per additional update",
     detailPage: "/plans/standard"
   },
   {
@@ -201,11 +206,12 @@ const monthlyPlans: PricingPlan[] = [
       "Unlimited pages",
       "Domain & hosting included",
       "Full SEO optimization",
-      "Unlimited updates & support",
+      "10 monthly updates included",
       "Complete online store",
       "Product management system",
       "Payment processing"
     ],
+    highlightFeature: "Pay $5 per additional update",
     detailPage: "/plans/pro-ecommerce"
   }
 ];

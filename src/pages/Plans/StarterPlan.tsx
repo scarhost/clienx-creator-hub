@@ -68,6 +68,10 @@ const StarterPlan = () => {
                   <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
                   <span>Content changes include: text updates, image swaps, simple layout adjustments</span>
                 </li>
+                <li className="flex items-start text-gray-300">
+                  <Check className="h-5 w-5 text-primary-400 mr-2 flex-shrink-0" />
+                  <span>Pre-built website support: $20-50 per feature (based on complexity)</span>
+                </li>
               </ul>
               
               <div className="mt-8">
@@ -97,7 +101,7 @@ const StarterPlan = () => {
                 <p className="text-gray-400 mb-6">Perfect for simple websites with minimal updates</p>
                 
                 <div className="bg-primary-400/10 text-primary-400 px-3 py-2 rounded-md text-sm mb-6 font-medium">
-                  Pay $5 per additional update
+                  2 updates/month included
                 </div>
                 
                 <Button 

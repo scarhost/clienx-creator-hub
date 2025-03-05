@@ -1,12 +1,14 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Crown, Eye, Clock, ExternalLink, MessageSquare } from "lucide-react";
+import { Pencil, Crown, Eye, Clock, ExternalLink, MessageSquare, Info } from "lucide-react";
 import { toast } from "sonner";
 import { SingleUpdateRequest } from "@/components/dashboard/SingleUpdateRequest";
+import { PreBuiltWebsiteSupport } from "@/components/dashboard/PreBuiltWebsiteSupport";
 
 interface WebsiteRequest {
   id: string;
@@ -23,6 +25,26 @@ const Dashboard = () => {
   const [userRequests, setUserRequests] = useState<WebsiteRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [userPlan, setUserPlan] = useState<'starter' | 'standard' | 'pro-ecommerce'>('starter');
+  const [usedRequests, setUsedRequests] = useState(0);
+
+  // Get monthly request limit based on plan
+  const getMonthlyRequestLimit = () => {
+    switch (userPlan) {
+      case 'starter':
+        return 2;
+      case 'standard':
+        return 10;
+      case 'pro-ecommerce':
+        return 10;
+      default:
+        return 2;
+    }
+  };
+
+  // Check if the user can make customization requests based on their plan
+  const canRequestCustomization = () => {
+    return userPlan === 'standard' || userPlan === 'pro-ecommerce';
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -47,6 +69,16 @@ const Dashboard = () => {
         // For demo purposes, we'll use a fixed plan type
         // In a real app, this would come from the user's subscription data
         setUserPlan('starter');
+        
+        // Count requests made in the current month (demo)
+        const currentMonthRequests = (data || []).filter(req => {
+          const requestDate = new Date(req.created_at);
+          const currentDate = new Date();
+          return requestDate.getMonth() === currentDate.getMonth() && 
+                 requestDate.getFullYear() === currentDate.getFullYear();
+        }).length;
+        
+        setUsedRequests(currentMonthRequests);
       } catch (error) {
         console.error("Error fetching website requests:", error);
         toast.error("Failed to load your website requests");
@@ -178,7 +210,11 @@ const Dashboard = () => {
                 <Crown className="h-5 w-5 text-primary" />
                 <p className="text-lg font-medium">{userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan</p>
               </div>
-              <p className="text-sm text-gray-400 mb-4">Access to basic features</p>
+              <p className="text-sm text-gray-400 mb-2">Access to basic features</p>
+              <div className="bg-gray-800/50 rounded-md px-3 py-2 mb-4 flex items-center justify-between">
+                <span className="text-sm">Monthly Update Requests</span>
+                <span className="text-sm font-medium">{usedRequests} / {getMonthlyRequestLimit()} used</span>
+              </div>
               <Button className="w-full" onClick={() => navigate('/pricing')}>Upgrade Plan</Button>
             </div>
             
@@ -242,35 +278,49 @@ const Dashboard = () => {
             <SingleUpdateRequest planType={userPlan} />
           </Card>
 
+          {canRequestCustomization() && (
+            <Card className="p-6 md:col-span-2">
+              <h2 className="text-xl font-semibold mb-4">Request Customization</h2>
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Website</label>
+                  <select className="w-full p-2 rounded-md border border-gray-800 bg-background">
+                    {userRequests.length > 0 ? (
+                      userRequests.map(request => (
+                        <option key={request.id} value={request.id}>
+                          {request.template_name} - {formatDate(request.created_at)}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No websites available</option>
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Changes Requested</label>
+                  <textarea 
+                    className="w-full p-2 rounded-md border border-gray-800 bg-background min-h-[100px]"
+                    placeholder="Describe the changes you'd like..."
+                  />
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-400 mt-2 mb-4">
+                  <span>Updates remaining this month: {getMonthlyRequestLimit() - usedRequests}</span>
+                  <Button variant="link" className="p-0 h-auto text-primary" size="sm">
+                    <Info className="h-3 w-3 mr-1" />
+                    Included with your plan
+                  </Button>
+                </div>
+                <Button type="submit" className="w-full" disabled={userRequests.length === 0 || usedRequests >= getMonthlyRequestLimit()}>
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Submit Request
+                </Button>
+              </form>
+            </Card>
+          )}
+
           <Card className="p-6 md:col-span-2">
-            <h2 className="text-xl font-semibold mb-4">Request Customization</h2>
-            <form className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Website</label>
-                <select className="w-full p-2 rounded-md border border-gray-800 bg-background">
-                  {userRequests.length > 0 ? (
-                    userRequests.map(request => (
-                      <option key={request.id} value={request.id}>
-                        {request.template_name} - {formatDate(request.created_at)}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>No websites available</option>
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Changes Requested</label>
-                <textarea 
-                  className="w-full p-2 rounded-md border border-gray-800 bg-background min-h-[100px]"
-                  placeholder="Describe the changes you'd like..."
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={userRequests.length === 0}>
-                <Pencil className="w-4 h-4 mr-2" />
-                Submit Request
-              </Button>
-            </form>
+            <h2 className="text-xl font-semibold mb-4">Pre-built Website Support</h2>
+            <PreBuiltWebsiteSupport />
           </Card>
         </div>
       </div>

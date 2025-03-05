@@ -23,9 +23,9 @@ export const SingleUpdateRequest: React.FC<SingleUpdateRequestProps> = ({ planTy
       case 'starter':
         return 5;
       case 'standard':
-        return 10;
+        return 5;
       case 'pro-ecommerce':
-        return 15;
+        return 5;
       default:
         return 5;
     }

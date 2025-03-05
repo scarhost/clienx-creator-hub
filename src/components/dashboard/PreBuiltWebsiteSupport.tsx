@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, HelpCircle } from "lucide-react";
+import { CreditCard, HelpCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -13,12 +13,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export const PreBuiltWebsiteSupport = () => {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [featureType, setFeatureType] = useState("");
   const [featureDetails, setFeatureDetails] = useState("");
-  const [isPaying, setIsPaying] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDocsDialog, setShowDocsDialog] = useState(false);
   
   // Get price based on feature complexity
   const getFeaturePrice = () => {
@@ -36,14 +45,15 @@ export const PreBuiltWebsiteSupport = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPaying(true);
+    setIsSubmitting(true);
     
-    // Simulate payment processing
+    // Simulate request submission
     setTimeout(() => {
-      setIsPaying(false);
-      toast.success("Feature request submitted successfully!");
+      setIsSubmitting(false);
+      toast.success("Feature request submitted successfully! We'll review and provide a quote based on complexity.");
       setFeatureDetails("");
       setWebsiteUrl("");
+      setFeatureType("");
     }, 1500);
   };
   
@@ -53,20 +63,36 @@ export const PreBuiltWebsiteSupport = () => {
         <div className="mb-4">
           <p className="text-sm text-gray-300 mb-3">
             We can help customize your existing website with new features or changes, 
-            regardless of where it was built. Pricing depends on complexity.
+            regardless of where it was built. Simply submit your request below and we'll review it.
+            Pricing will depend on complexity (typically $20-$50).
           </p>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Website URL</label>
-            <Input
-              type="url"
-              value={websiteUrl}
-              onChange={(e) => setWebsiteUrl(e.target.value)}
-              placeholder="https://your-website.com"
-              required
-            />
+            <label className="text-sm font-medium">Google Docs Link</label>
+            <div className="relative">
+              <Input
+                type="url"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                placeholder="https://docs.google.com/document/d/..."
+                required
+                onClick={() => setShowDocsDialog(true)}
+              />
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="sm" 
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400"
+                onClick={() => setShowDocsDialog(true)}
+              >
+                <FileText className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-gray-400">
+              Please share a Google Docs document with your website details and requirements
+            </p>
           </div>
           
           <div className="space-y-2">
@@ -91,12 +117,12 @@ export const PreBuiltWebsiteSupport = () => {
             </div>
             <Select value={featureType} onValueChange={setFeatureType}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select complexity level" />
+                <SelectValue placeholder="Select expected complexity level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="easy">Easy ($20)</SelectItem>
-                <SelectItem value="medium">Medium ($35)</SelectItem>
-                <SelectItem value="complex">Complex ($50)</SelectItem>
+                <SelectItem value="easy">Easy (approx. $20)</SelectItem>
+                <SelectItem value="medium">Medium (approx. $35)</SelectItem>
+                <SelectItem value="complex">Complex (approx. $50)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -115,21 +141,59 @@ export const PreBuiltWebsiteSupport = () => {
           <div className="pt-4">
             <Button 
               type="submit"
-              disabled={!websiteUrl || !featureType || !featureDetails || isPaying}
+              disabled={!websiteUrl || !featureType || !featureDetails || isSubmitting}
               className="w-full"
             >
-              {isPaying ? (
-                <>Processing Payment...</>
+              {isSubmitting ? (
+                <>Submitting Request...</>
               ) : (
                 <>
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Pay ${getFeaturePrice()} & Submit Request
+                  Submit Request
                 </>
               )}
             </Button>
+            <p className="text-xs text-center mt-2 text-gray-400">
+              There's no charge to submit a request. We'll review and provide a quote based on complexity.
+            </p>
           </div>
         </form>
       </CardContent>
+
+      <Dialog open={showDocsDialog} onOpenChange={setShowDocsDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>How to Share Google Docs</DialogTitle>
+            <DialogDescription>
+              Follow these steps to properly share your Google Docs document with us.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-medium">1. Create a Google Doc</h3>
+              <p className="text-sm text-gray-400">
+                Create a new Google Docs document with all your website details, screenshots, and specific requirements.
+              </p>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-medium">2. Set Sharing Permissions</h3>
+              <p className="text-sm text-gray-400">
+                Click "Share" in the top right, then change access to "Anyone with the link" and set to "Editor" so we can add comments.
+              </p>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-medium">3. Copy and Share the Link</h3>
+              <p className="text-sm text-gray-400">
+                Copy the link from the sharing dialog and paste it in the field above.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <DialogClose asChild>
+              <Button variant="default">Got it</Button>
+            </DialogClose>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

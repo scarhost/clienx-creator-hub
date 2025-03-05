@@ -17,17 +17,21 @@ export const SingleUpdateRequest: React.FC<SingleUpdateRequestProps> = ({ planTy
   const [requestDetails, setRequestDetails] = useState<string>("");
   const [isPaying, setIsPaying] = useState(false);
   
-  // Get update price based on plan
+  // Get update price based on plan - all plans have the same price for single updates
   const getUpdatePrice = () => {
+    return 5; // $5 for all plans
+  };
+  
+  const getUpdateLimit = () => {
     switch (planType) {
       case 'starter':
-        return 5;
+        return 2;
       case 'standard':
-        return 5;
+        return 10;
       case 'pro-ecommerce':
-        return 5;
+        return 10;
       default:
-        return 5;
+        return 2;
     }
   };
   
@@ -40,6 +44,7 @@ export const SingleUpdateRequest: React.FC<SingleUpdateRequestProps> = ({ planTy
       setIsPaying(false);
       toast.success("Update request submitted successfully!");
       setRequestDetails("");
+      setSelectedWebsite("");
     }, 1500);
   };
   
@@ -87,6 +92,9 @@ export const SingleUpdateRequest: React.FC<SingleUpdateRequestProps> = ({ planTy
             <p className="text-xs text-gray-400 mb-3">
               <Clock className="w-3 h-3 inline mr-1" />
               Updates are typically completed within 24-48 hours
+            </p>
+            <p className="text-xs text-gray-400">
+              Your plan includes {getUpdateLimit()} updates per month. Additional updates are ${getUpdatePrice()} each.
             </p>
           </div>
         </form>

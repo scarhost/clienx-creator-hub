@@ -10,9 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 interface PlanSelectorProps {
   currentPlan: string;
   onPlanChange: (plan: 'starter' | 'standard' | 'pro-ecommerce') => void;
+  userId?: string; // Optional userId for admin to update other users
 }
 
-export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanChange }) => {
+export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanChange, userId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   
@@ -25,7 +26,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanC
       features: [
         '1-3 pages included',
         'Domain & hosting included',
-        '2 updates per month',
+        '5 request credits per month',
         'Mobile responsive design'
       ]
     },
@@ -37,7 +38,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanC
       features: [
         '5-10 pages included',
         'Domain & hosting included',
-        '10 monthly updates included',
+        '10 request credits per month',
         'Basic SEO optimization'
       ]
     },
@@ -49,8 +50,8 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanC
       features: [
         'Unlimited pages',
         'Domain & hosting included',
+        '15 request credits per month',
         'Full SEO optimization',
-        '10 monthly updates included',
         'Complete online store'
       ]
     }
@@ -60,25 +61,39 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanC
     try {
       setIsLoading(true);
       
-      // Get current user
-      const { data: { session } } = await supabase.auth.getSession();
+      // Get current user if userId is not provided (user updating their own plan)
+      const targetUserId = userId || (await supabase.auth.getSession()).data.session?.user.id;
       
-      if (!session) {
+      if (!targetUserId) {
         toast.error("You must be logged in to select a plan");
         navigate("/auth/signin");
         return;
       }
       
-      // For demo/testing, just update the state without actual payment
-      setTimeout(() => {
-        onPlanChange(plan);
-        toast.success(`Your plan has been updated to ${plan.charAt(0).toUpperCase() + plan.slice(1)}`);
+      // Update the user's plan in the database
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ 
+          plan: plan,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', targetUserId);
+      
+      if (error) {
+        console.error("Error updating plan:", error);
+        toast.error("Failed to update plan");
         setIsLoading(false);
-      }, 1000);
+        return;
+      }
+      
+      // Update local state
+      onPlanChange(plan);
+      toast.success(`Plan updated to ${plan.charAt(0).toUpperCase() + plan.slice(1)}`);
       
     } catch (error) {
       console.error("Error updating plan:", error);
       toast.error("Failed to update plan");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -86,7 +101,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanC
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Select a Plan</h2>
-      <p className="text-gray-400">Choose the plan that works best for your needs. For testing purposes, plans can be switched without payment.</p>
+      <p className="text-gray-400">Choose the plan that works best for your needs.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
         {plans.map((plan) => (
@@ -119,7 +134,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({ currentPlan, onPlanC
                 disabled={currentPlan === plan.id || isLoading}
                 onClick={() => handleSelectPlan(plan.id as 'starter' | 'standard' | 'pro-ecommerce')}
               >
-                {currentPlan === plan.id ? 'Current Plan' : `Select ${plan.name}`}
+                {isLoading ? "Updating..." : currentPlan === plan.id ? 'Current Plan' : `Select ${plan.name}`}
               </Button>
             </CardContent>
           </Card>

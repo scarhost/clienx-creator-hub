@@ -12,7 +12,7 @@ const PlanSelection = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuthAndFetchPlan = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate("/auth/signin");
@@ -21,9 +21,24 @@ const PlanSelection = () => {
 
       try {
         setLoading(true);
-        // In a real app, we would fetch the user's plan from a database
-        // For now, just use 'starter' as default
-        setUserPlan('starter');
+        
+        // Fetch the user's current plan from the user_profiles table
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('plan')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (error) {
+          console.error("Error fetching user plan:", error);
+          toast.error("Failed to load your plan information");
+          return;
+        }
+        
+        if (data) {
+          // Type assertion to ensure the plan is one of the valid options
+          setUserPlan(data.plan as 'starter' | 'standard' | 'pro-ecommerce');
+        }
       } catch (error) {
         console.error("Error fetching user plan:", error);
         toast.error("Failed to load your plan information");
@@ -32,7 +47,7 @@ const PlanSelection = () => {
       }
     };
     
-    checkAuth();
+    checkAuthAndFetchPlan();
   }, [navigate]);
 
   const handlePlanChange = (plan: 'starter' | 'standard' | 'pro-ecommerce') => {

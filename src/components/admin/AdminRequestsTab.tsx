@@ -24,6 +24,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { WebsiteCompletionDetails } from '@/components/admin/WebsiteCompletionDetails';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 type RequestStatus = "pending" | "in_progress" | "completed" | "rejected";
 
@@ -46,7 +47,9 @@ interface WebsiteRequest {
 
 export const AdminRequestsTab = () => {
   const [requests, setRequests] = useState<WebsiteRequest[]>([]);
+  const [supportRequests, setSupportRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSupport, setLoadingSupport] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<WebsiteRequest | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
@@ -107,8 +110,26 @@ export const AdminRequestsTab = () => {
     }
   };
 
+  const fetchSupportRequests = async () => {
+    try {
+      setLoadingSupport(true);
+      
+      // Placeholder for support requests - in a real app, this would fetch from a support_requests table
+      // For now, we're simulating this with empty data
+      const mockSupportRequests = [];
+      
+      setSupportRequests(mockSupportRequests);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An unexpected error occurred loading support requests');
+    } finally {
+      setLoadingSupport(false);
+    }
+  };
+
   useEffect(() => {
     fetchRequests();
+    fetchSupportRequests();
   }, []);
 
   const handleStatusChange = async (requestId: string, newStatus: RequestStatus) => {
@@ -137,7 +158,7 @@ export const AdminRequestsTab = () => {
         return;
       }
       
-      toast.success(`Request status updated to ${newStatus}`);
+      toast.success(`Request status updated to ${newStatus === 'in_progress' ? 'Accepted, In Progress' : newStatus}`);
       setSelectedRequest(null);
       setAdminNotes('');
       fetchRequests();
@@ -158,7 +179,7 @@ export const AdminRequestsTab = () => {
     try {
       setUpdatingStatus(true);
       
-      const { error } = await supabase
+      const { error: requestError } = await supabase
         .from('website_requests')
         .update({ 
           status: "completed",
@@ -169,10 +190,24 @@ export const AdminRequestsTab = () => {
         })
         .eq('id', selectedRequest.id);
       
-      if (error) {
-        console.error('Error completing request:', error);
+      if (requestError) {
+        console.error('Error completing request:', requestError);
         toast.error('Failed to complete request');
         return;
+      }
+      
+      // Also update the user profile with the website URL
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .update({ 
+          website_url: websiteUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedRequest.user_id);
+      
+      if (profileError) {
+        console.error('Error updating user profile:', profileError);
+        toast.error('Updated request but failed to update user profile');
       }
       
       toast.success("Request marked as completed with website details");
@@ -210,7 +245,7 @@ export const AdminRequestsTab = () => {
 
   const statusLabels = {
     pending: "Pending Review",
-    in_progress: "In Progress",
+    in_progress: "Accepted, In Progress",
     completed: "Completed",
     rejected: "Rejected"
   };
@@ -218,75 +253,120 @@ export const AdminRequestsTab = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Website Update Requests</CardTitle>
-        <div className="flex items-center mt-4">
-          <Search className="w-4 h-4 mr-2 text-gray-400" />
-          <Input
-            placeholder="Search requests..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-        </div>
+        <CardTitle>Website Request Management</CardTitle>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="text-center py-4">Loading requests...</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Template</TableHead>
-                <TableHead>Request Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRequests.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    No requests found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredRequests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{request.user_name || 'Unknown'}</p>
-                        <p className="text-sm text-gray-400">{request.user_email || 'No email'}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{request.template_name} ({request.template_style})</TableCell>
-                    <TableCell>{new Date(request.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        {statusIcons[request.status]}
-                        <span className="text-sm font-medium">{statusLabels[request.status]}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setSelectedRequest(request);
-                          setAdminNotes(request.admin_notes || '');
-                          setWebsiteType(request.website_type || "one_time");
-                          setWebsiteUrl(request.website_url || '');
-                        }}
-                      >
-                        Review
-                      </Button>
+        <Tabs defaultValue="requests" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="requests">Website Requests</TabsTrigger>
+            <TabsTrigger value="support">Add-on Support Requests</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="requests">
+            <div className="flex items-center mb-4">
+              <Search className="w-4 h-4 mr-2 text-gray-400" />
+              <Input
+                placeholder="Search requests..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+            
+            {loading ? (
+              <div className="text-center py-4">Loading requests...</div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Template</TableHead>
+                    <TableHead>Request Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRequests.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-4">
+                        No requests found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredRequests.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{request.user_name || 'Unknown'}</p>
+                            <p className="text-sm text-gray-400">{request.user_email || 'No email'}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>{request.template_name} ({request.template_style})</TableCell>
+                        <TableCell>{new Date(request.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {statusIcons[request.status]}
+                            <span className="text-sm font-medium">{statusLabels[request.status]}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setAdminNotes(request.admin_notes || '');
+                              setWebsiteType(request.website_type || "one_time");
+                              setWebsiteUrl(request.website_url || '');
+                            }}
+                          >
+                            Review
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="support">
+            <h3 className="text-lg font-medium mb-4">Add-on Feature Requests</h3>
+            
+            {loadingSupport ? (
+              <div className="text-center py-4">Loading support requests...</div>
+            ) : supportRequests.length === 0 ? (
+              <Card className="bg-muted/30">
+                <CardContent className="py-8 text-center">
+                  <p className="text-muted-foreground">No add-on support requests found.</p>
+                  <p className="text-sm text-muted-foreground mt-1">When users request additional features for their websites, they will appear here.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Website</TableHead>
+                    <TableHead>Feature Requested</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* This will be populated when we have actual support request data */}
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-4">
+                      No support requests available
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        )}
+                </TableBody>
+              </Table>
+            )}
+          </TabsContent>
+        </Tabs>
 
         {selectedRequest && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -345,7 +425,7 @@ export const AdminRequestsTab = () => {
                       disabled={updatingStatus}
                       className="flex-1"
                     >
-                      Mark In Progress
+                      Mark Accepted, In Progress
                     </Button>
                     <Button 
                       variant="default" 

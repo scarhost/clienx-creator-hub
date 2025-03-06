@@ -73,14 +73,6 @@ const Templates = () => {
       image: "https://placehold.co/600x400/808080/FFFFFF/?text=E-commerce+Basic",
       previewUrl: "https://example-ecommerce.vercel.app"
     },
-    {
-      id: 6,
-      name: "Blog Standard",
-      description: "Perfect template for content creators",
-      style: "classic",
-      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Blog+Standard",
-      previewUrl: "https://kzmgi522ped7f70ydq3a.lite.vusercontent.net"
-    },
   ];
 
   useEffect(() => {

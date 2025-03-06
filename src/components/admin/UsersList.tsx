@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { UserProfileEditor } from './UserProfileEditor';
+import { ExternalLink } from 'lucide-react';
 
 type UserProfile = {
   id: string;
@@ -110,14 +111,17 @@ export const UsersList = () => {
                       <TableCell>{user.phone || 'N/A'}</TableCell>
                       <TableCell>
                         {user.website_url ? (
-                          <a 
-                            href={user.website_url.startsWith('http') ? user.website_url : `https://${user.website_url}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:underline"
-                          >
-                            {user.website_url}
-                          </a>
+                          <div className="flex items-center space-x-1">
+                            <a 
+                              href={user.website_url.startsWith('http') ? user.website_url : `https://${user.website_url}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline flex items-center"
+                            >
+                              {user.website_url}
+                              <ExternalLink className="ml-1 w-3 h-3" />
+                            </a>
+                          </div>
                         ) : (
                           'N/A'
                         )}

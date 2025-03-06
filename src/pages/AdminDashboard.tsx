@@ -71,18 +71,18 @@ const AdminDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-        <Tabs defaultValue="users" className="w-full">
+        <Tabs defaultValue="requests" className="w-full">
           <TabsList className="mb-6">
+            <TabsTrigger value="requests">Website Requests</TabsTrigger>
             <TabsTrigger value="users">Manage Users</TabsTrigger>
-            <TabsTrigger value="requests">Update Requests</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="users">
-            <UsersList />
-          </TabsContent>
           
           <TabsContent value="requests">
             <AdminRequestsTab />
+          </TabsContent>
+          
+          <TabsContent value="users">
+            <UsersList />
           </TabsContent>
         </Tabs>
       </div>

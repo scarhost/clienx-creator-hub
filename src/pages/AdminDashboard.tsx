@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UsersList } from "@/components/admin/UsersList";
 import { AdminRequestsTab } from "@/components/admin/AdminRequestsTab";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const AdminDashboard = () => {
   const [session, setSession] = useState(null);
@@ -20,12 +21,18 @@ const AdminDashboard = () => {
         if (error) throw error;
         setSession(data.session);
         
-        // In a real app, we'd check if the user has admin rights here
+        // In a real app, we'd check if the user has admin rights
         if (!data.session) {
+          toast.error("You must be signed in to access this page");
           navigate("/auth/signin");
+          return;
         }
+
+        // For demo purposes, all logged-in users can access the admin dashboard
+        // In a production app, you would check for admin role here
       } catch (error) {
         console.error("Error checking auth:", error);
+        toast.error("Error checking authentication");
       } finally {
         setLoading(false);
       }

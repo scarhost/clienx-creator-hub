@@ -44,30 +44,44 @@ export const AdminRequestsTab = () => {
     try {
       setLoading(true);
       
-      // Fetch requests with user profiles joined
-      const { data, error } = await supabase
+      // First fetch all requests
+      const { data: requestsData, error: requestsError } = await supabase
         .from('website_requests')
-        .select(`
-          *,
-          user_profiles:user_id (
-            email,
-            name
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching requests:', error);
+      if (requestsError) {
+        console.error('Error fetching requests:', requestsError);
         toast.error('Failed to load requests');
         return;
       }
 
-      // Transform the data to include user information
-      const transformedData = data.map(item => ({
-        ...item,
-        user_email: item.user_profiles?.email,
-        user_name: item.user_profiles?.name,
-      }));
+      // Then fetch all user profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, email, name');
+      
+      if (profilesError) {
+        console.error('Error fetching user profiles:', profilesError);
+        toast.error('Failed to load user data');
+        return;
+      }
+      
+      // Map user data to requests
+      const profileMap = new Map();
+      profilesData?.forEach(profile => {
+        profileMap.set(profile.id, profile);
+      });
+      
+      // Combine the data
+      const transformedData = requestsData.map(request => {
+        const userProfile = profileMap.get(request.user_id) || {};
+        return {
+          ...request,
+          user_email: userProfile.email || 'Unknown email',
+          user_name: userProfile.name || 'Unknown user'
+        };
+      });
       
       setRequests(transformedData as WebsiteRequest[]);
     } catch (error) {

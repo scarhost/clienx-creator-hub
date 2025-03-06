@@ -28,7 +28,7 @@ export const SingleUpdateRequest = ({
 
   const getBadgeVariant = () => {
     if (creditsRemaining <= 0) return "destructive";
-    if (creditsRemaining <= 2) return "warning";
+    if (creditsRemaining <= 2) return "secondary"; // Changed from "warning" to "secondary"
     return "default";
   };
 

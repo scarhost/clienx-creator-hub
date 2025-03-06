@@ -14,6 +14,16 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2, Search, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter 
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { WebsiteCompletionDetails } from '@/components/admin/WebsiteCompletionDetails';
 
 type RequestStatus = "pending" | "in_progress" | "completed" | "rejected";
 
@@ -30,6 +40,8 @@ interface WebsiteRequest {
   admin_notes?: string;
   user_email?: string;
   user_name?: string;
+  website_type?: "one_time" | "subscription";
+  website_url?: string;
 }
 
 export const AdminRequestsTab = () => {
@@ -39,6 +51,9 @@ export const AdminRequestsTab = () => {
   const [selectedRequest, setSelectedRequest] = useState<WebsiteRequest | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const [websiteType, setWebsiteType] = useState<"one_time" | "subscription">("one_time");
+  const [websiteUrl, setWebsiteUrl] = useState('');
 
   const fetchRequests = async () => {
     try {
@@ -97,6 +112,13 @@ export const AdminRequestsTab = () => {
   }, []);
 
   const handleStatusChange = async (requestId: string, newStatus: RequestStatus) => {
+    if (newStatus === "completed") {
+      if (selectedRequest) {
+        setShowCompletionDialog(true);
+      }
+      return;
+    }
+
     try {
       setUpdatingStatus(true);
       
@@ -118,6 +140,47 @@ export const AdminRequestsTab = () => {
       toast.success(`Request status updated to ${newStatus}`);
       setSelectedRequest(null);
       setAdminNotes('');
+      fetchRequests();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
+  const handleCompleteRequest = async () => {
+    if (!selectedRequest || !websiteUrl.trim()) {
+      toast.error("Please provide the website URL");
+      return;
+    }
+
+    try {
+      setUpdatingStatus(true);
+      
+      const { error } = await supabase
+        .from('website_requests')
+        .update({ 
+          status: "completed",
+          admin_notes: adminNotes || null,
+          website_type: websiteType,
+          website_url: websiteUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedRequest.id);
+      
+      if (error) {
+        console.error('Error completing request:', error);
+        toast.error('Failed to complete request');
+        return;
+      }
+      
+      toast.success("Request marked as completed with website details");
+      setSelectedRequest(null);
+      setAdminNotes('');
+      setShowCompletionDialog(false);
+      setWebsiteType("one_time");
+      setWebsiteUrl('');
       fetchRequests();
     } catch (error) {
       console.error('Error:', error);
@@ -211,6 +274,8 @@ export const AdminRequestsTab = () => {
                         onClick={() => {
                           setSelectedRequest(request);
                           setAdminNotes(request.admin_notes || '');
+                          setWebsiteType(request.website_type || "one_time");
+                          setWebsiteUrl(request.website_url || '');
                         }}
                       >
                         Review
@@ -253,6 +318,13 @@ export const AdminRequestsTab = () => {
                     <span>{statusLabels[selectedRequest.status]}</span>
                   </div>
                 </div>
+
+                {selectedRequest.status === "completed" && selectedRequest.website_url && (
+                  <WebsiteCompletionDetails 
+                    websiteType={selectedRequest.website_type || "one_time"} 
+                    websiteUrl={selectedRequest.website_url} 
+                  />
+                )}
                 
                 <div>
                   <label className="text-sm font-medium text-gray-400">Admin Notes</label>
@@ -315,6 +387,64 @@ export const AdminRequestsTab = () => {
             </div>
           </div>
         )}
+
+        <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Complete Website Request</DialogTitle>
+            </DialogHeader>
+            
+            <div className="py-4 space-y-4">
+              <div>
+                <Label>Website Delivery Type</Label>
+                <RadioGroup 
+                  value={websiteType} 
+                  onValueChange={(value) => setWebsiteType(value as "one_time" | "subscription")}
+                  className="mt-2 space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="one_time" id="one_time" />
+                    <Label htmlFor="one_time">One-time Payment (Google Drive Link)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="subscription" id="subscription" />
+                    <Label htmlFor="subscription">Subscription-based (Website URL)</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <div>
+                <Label htmlFor="website-url">
+                  {websiteType === "one_time" ? "Google Drive Link" : "Website URL"}
+                </Label>
+                <Input
+                  id="website-url"
+                  className="mt-1"
+                  placeholder={websiteType === "one_time" ? "Paste Google Drive link here" : "Enter the website URL"}
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowCompletionDialog(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleCompleteRequest}
+                disabled={updatingStatus || !websiteUrl.trim()}
+              >
+                Complete Request
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

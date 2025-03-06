@@ -5,6 +5,7 @@ import { PlanSelector } from "@/components/dashboard/PlanSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const PlanSelection = () => {
   const [userPlan, setUserPlan] = useState<'starter' | 'standard' | 'pro-ecommerce'>('starter');
@@ -52,6 +53,11 @@ const PlanSelection = () => {
 
   const handlePlanChange = (plan: 'starter' | 'standard' | 'pro-ecommerce') => {
     setUserPlan(plan);
+    toast.success(`Your plan has been updated to ${plan}`);
+    // Redirect to dashboard after a short delay
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 1500);
   };
 
   return (
@@ -60,7 +66,10 @@ const PlanSelection = () => {
         <h1 className="text-3xl font-bold mb-6">Manage Your Plan</h1>
         
         {loading ? (
-          <div className="text-center py-16">Loading your plan information...</div>
+          <div className="text-center py-16">
+            <Loader2 className="animate-spin w-8 h-8 mx-auto mb-2" />
+            <p>Loading your plan information...</p>
+          </div>
         ) : (
           <PlanSelector currentPlan={userPlan} onPlanChange={handlePlanChange} />
         )}

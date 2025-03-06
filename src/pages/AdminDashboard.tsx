@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UsersList } from "@/components/admin/UsersList";
-import { Card, CardContent } from "@/components/ui/card";
+import { AdminRequestsTab } from "@/components/admin/AdminRequestsTab";
+import { Loader2 } from "lucide-react";
 
 const AdminDashboard = () => {
   const [session, setSession] = useState(null);
@@ -37,7 +38,10 @@ const AdminDashboard = () => {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-16">
-          <div className="text-center">Loading...</div>
+          <div className="text-center">
+            <Loader2 className="animate-spin w-8 h-8 mx-auto mb-2" />
+            <p>Loading...</p>
+          </div>
         </div>
       </MainLayout>
     );
@@ -71,11 +75,7 @@ const AdminDashboard = () => {
           </TabsContent>
           
           <TabsContent value="requests">
-            <Card>
-              <CardContent className="pt-6">
-                <p>Update request management coming soon...</p>
-              </CardContent>
-            </Card>
+            <AdminRequestsTab />
           </TabsContent>
         </Tabs>
       </div>

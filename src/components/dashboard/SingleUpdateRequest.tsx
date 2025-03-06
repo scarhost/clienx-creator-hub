@@ -1,118 +1,141 @@
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-interface SingleUpdateRequestProps {
-  planType: 'starter' | 'standard' | 'pro-ecommerce';
+interface UpdateRequestProps {
+  userPlan: 'starter' | 'standard' | 'pro-ecommerce';
+  creditsUsed: number;
+  creditsTotal: number;
+  onRequestSubmitted: () => void;
 }
 
-export const SingleUpdateRequest: React.FC<SingleUpdateRequestProps> = ({ planType }) => {
-  const [selectedWebsite, setSelectedWebsite] = useState<string>("");
-  const [requestDetails, setRequestDetails] = useState<string>("");
-  const [isPaying, setIsPaying] = useState(false);
-  
-  // Get update price based on plan - all plans have the same price for single updates
-  const getUpdatePrice = () => {
-    return 5; // $5 for all plans
+export const SingleUpdateRequest = ({ 
+  userPlan, 
+  creditsUsed, 
+  creditsTotal,
+  onRequestSubmitted 
+}: UpdateRequestProps) => {
+  const [requestDetails, setRequestDetails] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const creditsRemaining = creditsTotal - creditsUsed;
+  const isOutOfCredits = creditsRemaining <= 0;
+
+  const getBadgeVariant = () => {
+    if (creditsRemaining <= 0) return "destructive";
+    if (creditsRemaining <= 2) return "warning";
+    return "default";
   };
-  
-  const getUpdateLimit = () => {
-    switch (planType) {
-      case 'starter':
-        return 2;
-      case 'standard':
-        return 10;
-      case 'pro-ecommerce':
-        return 10;
-      default:
-        return 2;
+
+  const handleSubmitRequest = async () => {
+    if (isOutOfCredits) {
+      toast.error("You've used all your request credits for this month. Please upgrade your plan or wait for next month's reset.");
+      return;
+    }
+
+    if (!requestDetails.trim()) {
+      toast.error("Please describe your update request");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("You must be signed in to submit a request");
+        return;
+      }
+
+      const { error } = await supabase
+        .from('website_requests')
+        .insert({
+          user_id: session.user.id,
+          template_id: 0, // Generic update request
+          template_name: "Website Update",
+          template_style: userPlan,
+          request_details: requestDetails,
+          status: "pending"
+        });
+
+      if (error) {
+        console.error("Error submitting request:", error);
+        toast.error("Failed to submit your request");
+        return;
+      }
+
+      toast.success("Your update request has been submitted!");
+      setRequestDetails("");
+      onRequestSubmitted();
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsPaying(true);
-    
-    // Simulate payment processing
-    setTimeout(() => {
-      setIsPaying(false);
-      toast.success("Update request submitted successfully!");
-      setRequestDetails("");
-      setSelectedWebsite("");
-    }, 1500);
-  };
-  
+
   return (
-    <Card className="border border-gray-800">
+    <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold">Single Update Request</CardTitle>
+            <CardTitle>Submit a Website Update Request</CardTitle>
             <CardDescription>
-              Pay-as-you-go for individual website changes
+              Use your monthly update credits to request changes to your website
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="px-2 py-1 bg-primary/20 text-primary-foreground">
-            ${getUpdatePrice()}
+          <Badge variant={getBadgeVariant()}>
+            {creditsRemaining} credits remaining
           </Badge>
         </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Select Website</label>
-            <Select value={selectedWebsite} onValueChange={setSelectedWebsite}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a website" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="website1">Business Pro - Created Feb 20, 2024</SelectItem>
-                <SelectItem value="website2">Portfolio Minimal - Created Mar 15, 2024</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Update Details</label>
-            <Textarea 
+        <div className="space-y-4">
+          <div>
+            <Textarea
+              placeholder="Describe the update you need for your website in detail..."
               value={requestDetails}
               onChange={(e) => setRequestDetails(e.target.value)}
-              placeholder="Describe the exact changes you need for your website..."
-              className="h-24"
+              className="min-h-[150px]"
+              disabled={isOutOfCredits || isSubmitting}
             />
           </div>
-          
-          <div className="pt-2">
-            <p className="text-xs text-gray-400 mb-3">
-              <Clock className="w-3 h-3 inline mr-1" />
-              Updates are typically completed within 24-48 hours
-            </p>
-            <p className="text-xs text-gray-400">
-              Your plan includes {getUpdateLimit()} updates per month. Additional updates are ${getUpdatePrice()} each.
-            </p>
+
+          {isOutOfCredits && (
+            <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md text-sm">
+              You've used all your update credits for this month. 
+              <a href="/plans/selection" className="underline ml-1">
+                Upgrade your plan
+              </a> for more credits or wait for next month's reset.
+            </div>
+          )}
+
+          <div className="bg-primary/10 text-primary-foreground px-4 py-3 rounded-md text-sm">
+            <p className="font-medium mb-1">Your {userPlan} plan includes:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>
+                {creditsTotal} update credits per month 
+                ({creditsUsed} used, {creditsRemaining} remaining)
+              </li>
+              <li>Each credit can be used for one update request</li>
+              <li>Credits reset on the first day of each month</li>
+            </ul>
           </div>
-        </form>
+        </div>
       </CardContent>
       <CardFooter>
-        <Button 
-          disabled={!selectedWebsite || !requestDetails || isPaying}
-          onClick={handleSubmit}
+        <Button
+          onClick={handleSubmitRequest}
+          disabled={isOutOfCredits || !requestDetails.trim() || isSubmitting}
           className="w-full"
         >
-          {isPaying ? (
-            <>Processing Payment...</>
-          ) : (
-            <>
-              <CreditCard className="w-4 h-4 mr-2" />
-              Pay ${getUpdatePrice()} & Submit Request
-            </>
-          )}
+          {isSubmitting ? "Submitting..." : "Submit Update Request"}
         </Button>
       </CardFooter>
     </Card>

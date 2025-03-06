@@ -6,8 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, CheckCircle2, Clock, Edit, ExternalLink } from "lucide-react";
+import { CheckCircle2, Clock, Edit, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { UserDashboardRequests } from "@/components/dashboard/UserDashboardRequests";
+import { SingleUpdateRequest } from "@/components/dashboard/SingleUpdateRequest";
+import { PreBuiltWebsiteSupport } from "@/components/dashboard/PreBuiltWebsiteSupport";
 
 const Dashboard = () => {
   const [session, setSession] = useState(null);
@@ -19,6 +22,7 @@ const Dashboard = () => {
     phone: '',
     website_url: '',
   });
+  const [requestsUsed, setRequestsUsed] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,6 +60,18 @@ const Dashboard = () => {
           });
         }
         
+        // Fetch number of request credits used
+        // In a real app, this would be implemented properly
+        const { data: requestsData, error: requestsError } = await supabase
+          .from('website_requests')
+          .select('*')
+          .eq('user_id', data.session.user.id)
+          .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
+          
+        if (!requestsError && requestsData) {
+          setRequestsUsed(requestsData.length);
+        }
+        
       } catch (error) {
         console.error("Error checking auth:", error);
       } finally {
@@ -85,11 +101,29 @@ const Dashboard = () => {
     }
   };
 
+  const handleRequestSubmitted = async () => {
+    // Refresh the number of requests used
+    if (session) {
+      const { data: requestsData } = await supabase
+        .from('website_requests')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
+        
+      if (requestsData) {
+        setRequestsUsed(requestsData.length);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-16">
-          <div className="text-center">Loading...</div>
+          <div className="text-center">
+            <Loader2 className="animate-spin w-8 h-8 mx-auto mb-2" />
+            <p>Loading...</p>
+          </div>
         </div>
       </MainLayout>
     );
@@ -135,8 +169,10 @@ const Dashboard = () => {
               <CardDescription>Available this month</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{getRequestCredits()} Credits</div>
-              <p className="text-gray-400 mt-2">Renews on the 1st of next month</p>
+              <div className="text-2xl font-bold">{getRequestCredits() - requestsUsed} Credits</div>
+              <p className="text-gray-400 mt-2">
+                Used {requestsUsed} of {getRequestCredits()} credits this month
+              </p>
             </CardContent>
             <CardFooter>
               <Button onClick={() => navigate("/requests")} variant="outline" className="w-full">
@@ -187,35 +223,28 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="pending" className="w-full">
+        <Tabs defaultValue="requests" className="w-full mb-8">
           <TabsList className="mb-6">
-            <TabsTrigger value="pending">Pending Requests</TabsTrigger>
-            <TabsTrigger value="completed">Completed Requests</TabsTrigger>
+            <TabsTrigger value="requests">Your Requests</TabsTrigger>
+            <TabsTrigger value="updateRequest">New Update Request</TabsTrigger>
+            <TabsTrigger value="addOns">Pre-built Support</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="pending">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-8 text-gray-400">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                  <p>You don't have any pending requests</p>
-                  <Button className="mt-4" onClick={() => navigate("/requests")}>
-                    Make a Request
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="requests">
+            <UserDashboardRequests />
           </TabsContent>
           
-          <TabsContent value="completed">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-8 text-gray-400">
-                  <CheckCircle2 className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                  <p>No completed requests found</p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="updateRequest">
+            <SingleUpdateRequest 
+              userPlan={userPlan}
+              creditsUsed={requestsUsed}
+              creditsTotal={getRequestCredits()}
+              onRequestSubmitted={handleRequestSubmitted}
+            />
+          </TabsContent>
+          
+          <TabsContent value="addOns">
+            <PreBuiltWebsiteSupport />
           </TabsContent>
         </Tabs>
       </div>

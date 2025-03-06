@@ -11,10 +11,11 @@ interface TemplateCardProps {
     description: string;
     style: string;
     image: string;
+    previewUrl: string;
   };
   selectedTemplate: number | null;
   onSelect: (templateId: number) => void;
-  onPreview: (templateName: string) => void;
+  onPreview: () => void;
 }
 
 export const TemplateCard: React.FC<TemplateCardProps> = ({ 
@@ -31,7 +32,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
       <div 
         className="aspect-video bg-gray-800 bg-center bg-cover cursor-pointer" 
         style={{ backgroundImage: `url(${template.image})` }}
-        onClick={() => onPreview(template.name)}
+        onClick={onPreview}
       />
       <CardContent className="p-4">
         <h3 className="text-lg font-semibold mb-2">{template.name}</h3>
@@ -40,7 +41,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           <Button 
             variant="outline" 
             className="flex-1"
-            onClick={() => onPreview(template.name)}
+            onClick={onPreview}
           >
             <Eye className="w-4 h-4 mr-2" />
             Preview

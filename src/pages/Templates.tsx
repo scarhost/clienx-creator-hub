@@ -26,6 +26,7 @@ const Templates = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewTemplateName, setPreviewTemplateName] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
   const [session, setSession] = useState<any>(null);
@@ -45,42 +46,40 @@ const Templates = () => {
       name: "Business Pro",
       description: "Perfect for small businesses and startups",
       style: "modern",
-      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Business+Pro"
+      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Business+Pro",
+      previewUrl: "https://example-business-pro.vercel.app"
     },
     {
       id: 2,
       name: "Portfolio Minimal",
       description: "Showcase your work with elegant simplicity",
       style: "minimal",
-      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Portfolio+Minimal"
-    },
-    {
-      id: 3,
-      name: "Creative Agency",
-      description: "Bold and colorful for creative professionals",
-      style: "bold",
-      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Creative+Agency"
+      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Portfolio+Minimal",
+      previewUrl: "https://example-portfolio-minimal.vercel.app"
     },
     {
       id: 4,
       name: "Professional Resume",
       description: "A polished template for job seekers",
       style: "classic",
-      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Professional+Resume"
+      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Professional+Resume",
+      previewUrl: "https://example-resume.vercel.app"
     },
     {
       id: 5,
       name: "E-commerce Basic",
       description: "Start selling products online immediately",
       style: "modern",
-      image: "https://placehold.co/600x400/808080/FFFFFF/?text=E-commerce+Basic"
+      image: "https://placehold.co/600x400/808080/FFFFFF/?text=E-commerce+Basic",
+      previewUrl: "https://example-ecommerce.vercel.app"
     },
     {
       id: 6,
       name: "Blog Standard",
       description: "Perfect template for content creators",
       style: "classic",
-      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Blog+Standard"
+      image: "https://placehold.co/600x400/808080/FFFFFF/?text=Blog+Standard",
+      previewUrl: "https://example-blog.vercel.app"
     },
   ];
 
@@ -120,8 +119,9 @@ const Templates = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePreviewTemplate = (templateName: string) => {
+  const handlePreviewTemplate = (templateName: string, previewUrl: string) => {
     setPreviewTemplateName(templateName);
+    setPreviewUrl(previewUrl);
     setIsPreviewOpen(true);
   };
 
@@ -232,7 +232,7 @@ ${formData.requestDetails}
               template={template}
               selectedTemplate={selectedTemplate}
               onSelect={handleTemplateSelect}
-              onPreview={handlePreviewTemplate}
+              onPreview={() => handlePreviewTemplate(template.name, template.previewUrl)}
             />
           ))}
         </div>
@@ -241,6 +241,7 @@ ${formData.requestDetails}
           open={isPreviewOpen} 
           onOpenChange={setIsPreviewOpen}
           templateName={previewTemplateName}
+          previewUrl={previewUrl}
         />
 
         <AuthModal 

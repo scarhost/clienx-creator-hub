@@ -55,7 +55,7 @@ const Templates = () => {
       description: "Showcase your work with elegant simplicity",
       style: "minimal",
       image: "https://placehold.co/600x400/808080/FFFFFF/?text=Portfolio+Minimal",
-      previewUrl: "https://example-portfolio-minimal.vercel.app"
+      previewUrl: "https://kzmgi522ped7f70ydq3a.lite.vusercontent.net"
     },
     {
       id: 4,
@@ -63,7 +63,7 @@ const Templates = () => {
       description: "A polished template for job seekers",
       style: "classic",
       image: "https://placehold.co/600x400/808080/FFFFFF/?text=Professional+Resume",
-      previewUrl: "https://example-resume.vercel.app"
+      previewUrl: "https://kzmgi522ped7f70ydq3a.lite.vusercontent.net"
     },
     {
       id: 5,
@@ -79,7 +79,7 @@ const Templates = () => {
       description: "Perfect template for content creators",
       style: "classic",
       image: "https://placehold.co/600x400/808080/FFFFFF/?text=Blog+Standard",
-      previewUrl: "https://example-blog.vercel.app"
+      previewUrl: "https://kzmgi522ped7f70ydq3a.lite.vusercontent.net"
     },
   ];
 

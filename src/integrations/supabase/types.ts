@@ -102,6 +102,8 @@ export type Database = {
           template_style: string
           updated_at: string | null
           user_id: string
+          website_type: string | null
+          website_url: string | null
         }
         Insert: {
           admin_notes?: string | null
@@ -114,6 +116,8 @@ export type Database = {
           template_style: string
           updated_at?: string | null
           user_id: string
+          website_type?: string | null
+          website_url?: string | null
         }
         Update: {
           admin_notes?: string | null
@@ -126,6 +130,8 @@ export type Database = {
           template_style?: string
           updated_at?: string | null
           user_id?: string
+          website_type?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }

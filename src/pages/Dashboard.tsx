@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,8 +59,27 @@ const Dashboard = () => {
           });
         }
         
+        // Also fetch the most recent completed website request to display details
+        const { data: websiteData, error: websiteError } = await supabase
+          .from('website_requests')
+          .select('*')
+          .eq('user_id', data.session.user.id)
+          .eq('status', 'completed')
+          .order('updated_at', { ascending: false })
+          .limit(1);
+          
+        if (!websiteError && websiteData && websiteData.length > 0) {
+          // If there's a completed website request and it has a URL,
+          // update the user profile state with this information
+          if (websiteData[0].website_url) {
+            setUserProfile(prev => ({
+              ...prev,
+              website_url: websiteData[0].website_url || prev.website_url,
+            }));
+          }
+        }
+        
         // Fetch number of request credits used
-        // In a real app, this would be implemented properly
         const { data: requestsData, error: requestsError } = await supabase
           .from('website_requests')
           .select('*')
@@ -82,7 +100,6 @@ const Dashboard = () => {
     checkAuth();
   }, [navigate]);
 
-  // Get the number of requests included in the current plan
   const getRequestCredits = () => {
     switch(userPlan) {
       case 'starter': return 5;

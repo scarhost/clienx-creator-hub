@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { WebsiteCompletionDetails } from "@/components/admin/WebsiteCompletionDetails";
 
 type RequestStatus = "pending" | "in_progress" | "completed" | "rejected";
 
@@ -21,6 +22,8 @@ interface WebsiteRequest {
   created_at: string;
   updated_at: string;
   admin_notes?: string;
+  website_type?: "one_time" | "subscription";
+  website_url?: string;
 }
 
 const statusIcons = {
@@ -125,6 +128,17 @@ const UserRequests = () => {
                       <p className="text-gray-400 text-sm mb-2">
                         <span className="font-medium">Submitted:</span> {new Date(request.created_at).toLocaleDateString()}
                       </p>
+                      
+                      {/* Show website completion details if request is completed and has website URL */}
+                      {request.status === "completed" && request.website_url && (
+                        <div className="my-4">
+                          <WebsiteCompletionDetails 
+                            websiteType={request.website_type || "one_time"} 
+                            websiteUrl={request.website_url} 
+                          />
+                        </div>
+                      )}
+                      
                       <div className="bg-gray-800/50 p-3 rounded-md mt-4">
                         <p className="text-sm font-medium mb-1">Your Request:</p>
                         <p className="text-gray-300 text-sm whitespace-pre-line">

@@ -1,333 +1,213 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ShoppingCart, Upload, Code, Layout, Search, ArrowRight } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Code, FileText, Globe, Workflow, 
+  Megaphone, Search, RefreshCw, Server,
+  Database, Globe2
+} from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+const SupportService = ({ 
+  icon: Icon, 
+  title, 
+  description, 
+  onSelect 
+}: { 
+  icon: any, 
+  title: string, 
+  description: string, 
+  onSelect: () => void 
+}) => (
+  <Card className="cursor-pointer hover:bg-gray-900/50 transition-colors" onClick={onSelect}>
+    <CardContent className="p-6">
+      <div className="flex items-start gap-4">
+        <div className="bg-primary/10 p-2 rounded-full">
+          <Icon className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+          <h3 className="font-medium text-lg mb-1">{title}</h3>
+          <p className="text-sm text-gray-400">{description}</p>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export const PreBuiltWebsiteSupport = () => {
-  const [selectedService, setSelectedService] = useState<PreBuiltService | null>(null);
-  const [showDialog, setShowDialog] = useState(false);
+  const [selectedService, setSelectedService] = useState('');
+  const [formDetails, setFormDetails] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleServiceSelect = (service: PreBuiltService) => {
+  const handleServiceSelect = (service: string) => {
     setSelectedService(service);
-    setShowDialog(true);
+    setFormDetails('');
   };
 
-  const handleRequestService = () => {
-    // In a real app, this would create a service request
-    toast.success(`Service request for ${selectedService?.title} submitted!`);
-    setShowDialog(false);
+  const handleBackToServices = () => {
+    setSelectedService('');
+    setFormDetails('');
+    setWebsiteUrl('');
   };
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Pre-built Website Support</h2>
-        <p className="text-gray-400">Add additional features to your website with our pre-built services</p>
-      </div>
+  const handleFormDetailsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormDetails(e.target.value);
+  };
 
-      <Tabs defaultValue="popular">
-        <TabsList>
-          <TabsTrigger value="popular">Popular Services</TabsTrigger>
-          <TabsTrigger value="ecommerce">E-commerce</TabsTrigger>
-          <TabsTrigger value="marketing">Marketing</TabsTrigger>
-        </TabsList>
+  const handleWebsiteUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWebsiteUrl(e.target.value);
+  };
 
-        <TabsContent value="popular" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {popularServices.map((service) => (
-              <ServiceCard 
-                key={service.id} 
-                service={service} 
-                onSelect={handleServiceSelect} 
-              />
-            ))}
-          </div>
-        </TabsContent>
+  const handleSubmitRequest = async () => {
+    try {
+      setIsSubmitting(true);
+      
+      // Check if the user is logged in
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        toast.error('You must be logged in to submit a request');
+        return;
+      }
+      
+      const { error } = await supabase
+        .from('addon_requests')
+        .insert({
+          user_id: session.user.id,
+          addon_type: selectedService,
+          request_details: `Website URL: ${websiteUrl}\n\n${formDetails}`,
+          status: 'pending',
+        });
+      
+      if (error) {
+        console.error('Error submitting request:', error);
+        toast.error('Failed to submit request');
+        return;
+      }
+      
+      toast.success('Support request submitted successfully');
+      handleBackToServices();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-        <TabsContent value="ecommerce" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {ecommerceServices.map((service) => (
-              <ServiceCard 
-                key={service.id} 
-                service={service} 
-                onSelect={handleServiceSelect} 
-              />
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="marketing" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {marketingServices.map((service) => (
-              <ServiceCard 
-                key={service.id} 
-                service={service} 
-                onSelect={handleServiceSelect} 
-              />
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{selectedService?.title}</DialogTitle>
-            <DialogDescription>
-              {selectedService?.description}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="my-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium">Price:</span>
-              <span className="font-bold text-lg">${selectedService?.price}</span>
-            </div>
-            
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium">Delivery Time:</span>
-              <span>{selectedService?.deliveryTime}</span>
-            </div>
-            
-            <div className="mt-4">
-              <h4 className="font-medium mb-2">What's included:</h4>
-              <ul className="space-y-2">
-                {selectedService?.features.map((feature, index) => (
-                  <li key={index} className="flex items-start text-sm">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 flex-shrink-0 mt-0.5" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleRequestService}>
-              Request Service
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-interface PreBuiltService {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  deliveryTime: string;
-  features: string[];
-  icon: React.ReactNode;
-  category: 'popular' | 'ecommerce' | 'marketing';
-}
-
-interface ServiceCardProps {
-  service: PreBuiltService;
-  onSelect: (service: PreBuiltService) => void;
-}
-
-const ServiceCard = ({ service, onSelect }: ServiceCardProps) => {
-  return (
-    <Card className="border border-gray-800">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="p-2 rounded-md bg-gray-800/70">{service.icon}</div>
-          <Badge variant="outline">${service.price}</Badge>
+  const renderServiceForm = () => {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-medium">{selectedService} Request</h3>
+          <Button variant="ghost" onClick={handleBackToServices}>
+            Back to all services
+          </Button>
         </div>
-        <CardTitle className="mt-4">{service.title}</CardTitle>
-        <CardDescription>{service.description}</CardDescription>
+        
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="website-url">Your Website URL</Label>
+            <Input 
+              id="website-url" 
+              placeholder="https://yourwebsite.com" 
+              value={websiteUrl}
+              onChange={handleWebsiteUrlChange}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="request-details">
+              {selectedService === 'Custom Code' ? 'Describe what functionality you need:' :
+               selectedService === 'Content Update' ? 'Describe what content needs to be updated:' :
+               selectedService === 'SEO Optimization' ? 'Any specific SEO concerns or goals:' :
+               selectedService === 'Performance Boost' ? 'Describe any performance issues you\'re experiencing:' :
+               selectedService === 'Design Tweak' ? 'Describe the design changes you\'d like:' :
+               selectedService === 'Web Hosting & Domain' ? 'Describe your hosting and domain needs:' :
+               'Request details:'}
+            </Label>
+            <Textarea 
+              id="request-details"
+              placeholder="Provide as much detail as possible to help us understand your request"
+              value={formDetails}
+              onChange={handleFormDetailsChange}
+              rows={8}
+              className="resize-none"
+            />
+          </div>
+          
+          <Button 
+            className="w-full" 
+            onClick={handleSubmitRequest}
+            disabled={!websiteUrl.trim() || !formDetails.trim() || isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Request'}
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Website Support Services</CardTitle>
+        <CardDescription>
+          Request additional services and support for your pre-built website
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-gray-400 mb-2">Delivery in {service.deliveryTime}</p>
-        <ul className="space-y-1">
-          {service.features.slice(0, 3).map((feature, index) => (
-            <li key={index} className="flex items-start text-sm">
-              <CheckCircle className="h-3 w-3 text-primary mr-2 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-300">{feature}</span>
-            </li>
-          ))}
-          {service.features.length > 3 && (
-            <li className="text-sm text-gray-400 pl-5">
-              +{service.features.length - 3} more features
-            </li>
-          )}
-        </ul>
+        {selectedService ? (
+          renderServiceForm()
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SupportService 
+              icon={Code}
+              title="Custom Code"
+              description="Request custom coding for specific functionality or features"
+              onSelect={() => handleServiceSelect('Custom Code')}
+            />
+            <SupportService 
+              icon={FileText}
+              title="Content Update"
+              description="Request changes or updates to your website content"
+              onSelect={() => handleServiceSelect('Content Update')}
+            />
+            <SupportService 
+              icon={Search}
+              title="SEO Optimization"
+              description="Get help improving your website's search engine ranking"
+              onSelect={() => handleServiceSelect('SEO Optimization')}
+            />
+            <SupportService 
+              icon={RefreshCw}
+              title="Performance Boost"
+              description="Optimize your website for better speed and performance"
+              onSelect={() => handleServiceSelect('Performance Boost')}
+            />
+            <SupportService 
+              icon={Workflow}
+              title="Design Tweak"
+              description="Request minor design changes to improve your website's look"
+              onSelect={() => handleServiceSelect('Design Tweak')}
+            />
+            <SupportService 
+              icon={Globe2}
+              title="Web Hosting & Domain"
+              description="Get help with domain registration and web hosting solutions"
+              onSelect={() => handleServiceSelect('Web Hosting & Domain')}
+            />
+          </div>
+        )}
       </CardContent>
-      <CardFooter>
-        <Button 
-          className="w-full" 
-          variant="outline"
-          onClick={() => onSelect(service)}
-        >
-          View Details
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
-
-const popularServices: PreBuiltService[] = [
-  {
-    id: 1,
-    title: "Contact Form Setup",
-    description: "Professional contact form with validation and email notifications",
-    price: 20,
-    deliveryTime: "2-3 days",
-    features: [
-      "Form validation",
-      "Custom styling to match your site",
-      "Email notifications",
-      "Anti-spam protection",
-      "Mobile responsive"
-    ],
-    icon: <Layout className="h-6 w-6 text-primary" />,
-    category: 'popular'
-  },
-  {
-    id: 2,
-    title: "SEO Optimization",
-    description: "Improve your site's search engine visibility",
-    price: 50,
-    deliveryTime: "3-5 days",
-    features: [
-      "Keyword optimization",
-      "Meta tags setup",
-      "Sitemap generation",
-      "Image optimization",
-      "Performance improvements",
-      "SEO report"
-    ],
-    icon: <Search className="h-6 w-6 text-primary" />,
-    category: 'popular'
-  },
-  {
-    id: 3,
-    title: "Image Gallery",
-    description: "Beautiful image gallery with lightbox functionality",
-    price: 30,
-    deliveryTime: "2-4 days",
-    features: [
-      "Responsive grid layout",
-      "Lightbox functionality",
-      "Lazy loading",
-      "Touch-friendly controls",
-      "Custom styling options"
-    ],
-    icon: <Upload className="h-6 w-6 text-primary" />,
-    category: 'popular'
-  }
-];
-
-const ecommerceServices: PreBuiltService[] = [
-  {
-    id: 4,
-    title: "Product Page Setup",
-    description: "Professional product display with images and details",
-    price: 40,
-    deliveryTime: "3-5 days",
-    features: [
-      "Image gallery",
-      "Product details layout",
-      "Variable pricing options",
-      "Mobile responsive design",
-      "SEO optimization"
-    ],
-    icon: <ShoppingCart className="h-6 w-6 text-primary" />,
-    category: 'ecommerce'
-  },
-  {
-    id: 5,
-    title: "Payment Gateway",
-    description: "Secure payment processing integration",
-    price: 70,
-    deliveryTime: "4-6 days",
-    features: [
-      "Stripe or PayPal integration",
-      "Secure checkout process",
-      "Payment confirmation emails",
-      "Mobile-friendly checkout",
-      "Order tracking capabilities"
-    ],
-    icon: <ShoppingCart className="h-6 w-6 text-primary" />,
-    category: 'ecommerce'
-  },
-  {
-    id: 6,
-    title: "Shopping Cart",
-    description: "Functional shopping cart with product management",
-    price: 60,
-    deliveryTime: "3-5 days",
-    features: [
-      "Add/remove products",
-      "Quantity adjustments",
-      "Cart persistence",
-      "Price calculations",
-      "Responsive design"
-    ],
-    icon: <ShoppingCart className="h-6 w-6 text-primary" />,
-    category: 'ecommerce'
-  }
-];
-
-const marketingServices: PreBuiltService[] = [
-  {
-    id: 7,
-    title: "Newsletter Signup",
-    description: "Email collection form with mailing list integration",
-    price: 25,
-    deliveryTime: "2-3 days",
-    features: [
-      "Custom signup form",
-      "Mailchimp integration",
-      "GDPR compliant",
-      "Popup or embedded options",
-      "Thank you message/page"
-    ],
-    icon: <Code className="h-6 w-6 text-primary" />,
-    category: 'marketing'
-  },
-  {
-    id: 8,
-    title: "Social Media Feed",
-    description: "Display your latest social media posts on your website",
-    price: 35,
-    deliveryTime: "2-4 days",
-    features: [
-      "Instagram feed integration",
-      "Twitter feed integration",
-      "Custom styling options",
-      "Auto-refresh capabilities",
-      "Mobile responsive design"
-    ],
-    icon: <Code className="h-6 w-6 text-primary" />,
-    category: 'marketing'
-  },
-  {
-    id: 9,
-    title: "Google Analytics",
-    description: "Professional analytics setup to track website performance",
-    price: 30,
-    deliveryTime: "1-2 days",
-    features: [
-      "Google Analytics setup",
-      "Goal tracking",
-      "Event tracking",
-      "Custom dashboard setup",
-      "Initial performance report"
-    ],
-    icon: <Code className="h-6 w-6 text-primary" />,
-    category: 'marketing'
-  }
-];

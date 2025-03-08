@@ -38,7 +38,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/templates" element={<Templates />} />
+        <Route path="/onboarding" element={<Templates />} />
         <Route path="/preview-template" element={<TemplatePreview />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/onboarding/business/info" element={<OnboardingBusinessInfo />} />
@@ -46,10 +46,10 @@ function App() {
         <Route path="/onboarding/portfolio/info" element={<OnboardingPortfolioInfo />} />
         
         {/* New Template Routes */}
-        <Route path="/templates/portfolio" element={<PortfolioTemplates />} />
-        <Route path="/templates/e-commerce" element={<ECommerceTemplates />} />
-        <Route path="/templates/business-showcase" element={<BusinessShowcaseTemplates />} />
-        <Route path="/templates/resume" element={<ResumeTemplates />} />
+        <Route path="/onboarding/portfolio" element={<PortfolioTemplates />} />
+        <Route path="/onboarding/e-commerce" element={<ECommerceTemplates />} />
+        <Route path="/onboarding/business-showcase" element={<BusinessShowcaseTemplates />} />
+        <Route path="/onboarding/resume" element={<ResumeTemplates />} />
         
         {/* Request Form Routes */}
         <Route path="/request/portfolio/:templateId" element={<PortfolioRequestForm />} />

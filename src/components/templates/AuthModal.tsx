@@ -47,7 +47,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <Auth
                 view="sign_in"
                 supabaseClient={supabase}
-                redirectTo={window.location.origin}
+                redirectTo={window.location.origin + "/onboarding"}
                 showLinks={false}
                 appearance={{
                   extend: false,
@@ -64,7 +64,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <Auth
                 view="sign_up"
                 supabaseClient={supabase}
-                redirectTo={window.location.origin}
+                redirectTo={window.location.origin + "/onboarding"}
                 showLinks={false}
                 appearance={{
                   extend: false,

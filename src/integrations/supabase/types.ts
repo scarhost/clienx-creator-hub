@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      addon_requests: {
+        Row: {
+          addon_type: string
+          admin_notes: string | null
+          created_at: string | null
+          id: string
+          request_details: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          addon_type: string
+          admin_notes?: string | null
+          created_at?: string | null
+          id?: string
+          request_details: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          addon_type?: string
+          admin_notes?: string | null
+          created_at?: string | null
+          id?: string
+          request_details?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           created_at: string | null

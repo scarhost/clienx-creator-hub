@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle, Clock, XCircle, AlertCircle, ExternalLink } from "lucide-react";
+import { Loader2, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { WebsiteCompletionDetails } from "@/components/admin/WebsiteCompletionDetails";
+import { WebsiteCompletionDisplay } from "@/components/dashboard/WebsiteCompletionDisplay";
 
 type RequestStatus = "pending" | "in_progress" | "completed" | "rejected";
 
@@ -125,10 +124,9 @@ export const UserDashboardRequests = () => {
                   Requested on {new Date(request.created_at).toLocaleDateString()}
                 </p>
                 
-                {/* Show website completion details if request is completed and has website URL */}
                 {request.status === "completed" && request.website_url && (
                   <div className="mb-4">
-                    <WebsiteCompletionDetails 
+                    <WebsiteCompletionDisplay 
                       websiteType={request.website_type || "one_time"} 
                       websiteUrl={request.website_url} 
                     />

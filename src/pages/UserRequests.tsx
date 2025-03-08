@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { WebsiteCompletionDetails } from "@/components/admin/WebsiteCompletionDetails";
+import { WebsiteCompletionDisplay } from "@/components/dashboard/WebsiteCompletionDisplay";
 
 type RequestStatus = "pending" | "in_progress" | "completed" | "rejected";
 
@@ -72,7 +71,6 @@ const UserRequests = () => {
 
       if (error) throw error;
       
-      // Fix the TypeScript error by properly casting the data
       setRequests((data as WebsiteRequest[]) || []);
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -87,7 +85,7 @@ const UserRequests = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Your Website Requests</h1>
-          <Button onClick={() => navigate("/templates")}>
+          <Button onClick={() => navigate("/onboarding")}>
             Submit New Request
           </Button>
         </div>
@@ -129,10 +127,9 @@ const UserRequests = () => {
                         <span className="font-medium">Submitted:</span> {new Date(request.created_at).toLocaleDateString()}
                       </p>
                       
-                      {/* Show website completion details if request is completed and has website URL */}
                       {request.status === "completed" && request.website_url && (
                         <div className="my-4">
-                          <WebsiteCompletionDetails 
+                          <WebsiteCompletionDisplay 
                             websiteType={request.website_type || "one_time"} 
                             websiteUrl={request.website_url} 
                           />

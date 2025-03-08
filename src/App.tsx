@@ -1,8 +1,6 @@
 
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Templates from "./pages/Templates";
-import TemplatePreview from "./pages/TemplatePreview";
 import Onboarding from "./pages/Onboarding";
 import OnboardingBusinessInfo from "./pages/OnboardingBusinessInfo";
 import OnboardingPersonalInfo from "./pages/OnboardingPersonalInfo";
@@ -38,9 +36,9 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Index />} />
-        {/* Redirect /templates to /onboarding */}
+        {/* Redirect all /templates routes to /onboarding */}
         <Route path="/templates" element={<Onboarding />} />
-        <Route path="/preview-template" element={<TemplatePreview />} />
+        <Route path="/preview-template" element={<Onboarding />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/onboarding/business/info" element={<OnboardingBusinessInfo />} />
         <Route path="/onboarding/personal/info" element={<OnboardingPersonalInfo />} />

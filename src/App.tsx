@@ -38,14 +38,15 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/onboarding" element={<Templates />} />
+        {/* Redirect /templates to /onboarding */}
+        <Route path="/templates" element={<Onboarding />} />
         <Route path="/preview-template" element={<TemplatePreview />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/onboarding/business/info" element={<OnboardingBusinessInfo />} />
         <Route path="/onboarding/personal/info" element={<OnboardingPersonalInfo />} />
         <Route path="/onboarding/portfolio/info" element={<OnboardingPortfolioInfo />} />
         
-        {/* New Template Routes */}
+        {/* Template Routes */}
         <Route path="/onboarding/portfolio" element={<PortfolioTemplates />} />
         <Route path="/onboarding/e-commerce" element={<ECommerceTemplates />} />
         <Route path="/onboarding/business-showcase" element={<BusinessShowcaseTemplates />} />

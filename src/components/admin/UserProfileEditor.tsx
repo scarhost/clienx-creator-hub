@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 
 type UserProfile = {
   id: string;
@@ -21,6 +22,7 @@ type UserProfile = {
   phone: string | null;
   plan: 'starter' | 'standard' | 'pro-ecommerce';
   website_url: string | null;
+  is_admin: boolean;
 };
 
 interface UserProfileEditorProps {
@@ -34,7 +36,8 @@ export const UserProfileEditor: React.FC<UserProfileEditorProps> = ({ user, onCl
     email: user.email || '',
     phone: user.phone || '',
     website_url: user.website_url || '',
-    plan: user.plan
+    plan: user.plan,
+    is_admin: user.is_admin || false
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,6 +53,10 @@ export const UserProfileEditor: React.FC<UserProfileEditorProps> = ({ user, onCl
     }));
   };
 
+  const handleAdminToggle = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, is_admin: checked }));
+  };
+
   const handleSubmit = async () => {
     try {
       setIsLoading(true);
@@ -62,6 +69,7 @@ export const UserProfileEditor: React.FC<UserProfileEditorProps> = ({ user, onCl
           phone: formData.phone || null,
           website_url: formData.website_url || null,
           plan: formData.plan,
+          is_admin: formData.is_admin,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -159,6 +167,22 @@ export const UserProfileEditor: React.FC<UserProfileEditorProps> = ({ user, onCl
                 <SelectItem value="pro-ecommerce">Pro E-commerce (15 credits/mo)</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="is_admin" className="text-right">
+              Admin Access
+            </Label>
+            <div className="flex items-center space-x-2 col-span-3">
+              <Switch 
+                id="is_admin" 
+                checked={formData.is_admin} 
+                onCheckedChange={handleAdminToggle} 
+              />
+              <Label htmlFor="is_admin" className="cursor-pointer">
+                {formData.is_admin ? 'Enabled' : 'Disabled'}
+              </Label>
+            </div>
           </div>
         </div>
         

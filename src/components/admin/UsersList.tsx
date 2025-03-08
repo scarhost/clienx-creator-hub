@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { UserProfileEditor } from './UserProfileEditor';
-import { ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ExternalLink, Shield } from 'lucide-react';
 
 type UserProfile = {
   id: string;
@@ -16,6 +17,7 @@ type UserProfile = {
   plan: 'starter' | 'standard' | 'pro-ecommerce';
   website_url: string | null;
   created_at: string;
+  is_admin: boolean;
 };
 
 export const UsersList = () => {
@@ -93,13 +95,14 @@ export const UsersList = () => {
                   <TableHead>Phone</TableHead>
                   <TableHead>Website</TableHead>
                   <TableHead>Plan</TableHead>
+                  <TableHead>Role</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-4">
+                    <TableCell colSpan={7} className="text-center py-4">
                       No users found
                     </TableCell>
                   </TableRow>
@@ -127,6 +130,16 @@ export const UsersList = () => {
                         )}
                       </TableCell>
                       <TableCell>{formatPlan(user.plan)}</TableCell>
+                      <TableCell>
+                        {user.is_admin ? (
+                          <Badge className="bg-purple-600 flex items-center space-x-1">
+                            <Shield className="w-3 h-3 mr-1" />
+                            Admin
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary">User</Badge>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button 
                           variant="outline" 

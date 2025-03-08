@@ -24,6 +24,14 @@ import StandardPlan from "./pages/Plans/StandardPlan";
 import ProEcommercePlan from "./pages/Plans/ProEcommercePlan";
 import PlanSelection from "./pages/Plans/PlanSelection";
 import { Toaster } from "sonner";
+import PortfolioTemplates from "./pages/templates/PortfolioTemplates";
+import ECommerceTemplates from "./pages/templates/ECommerceTemplates";
+import BusinessShowcaseTemplates from "./pages/templates/BusinessShowcaseTemplates";
+import ResumeTemplates from "./pages/templates/ResumeTemplates";
+import ResumeRequestForm from "./pages/request-forms/ResumeRequestForm";
+import BusinessRequestForm from "./pages/request-forms/BusinessRequestForm";
+import ECommerceRequestForm from "./pages/request-forms/ECommerceRequestForm";
+import PortfolioRequestForm from "./pages/request-forms/PortfolioRequestForm";
 
 function App() {
   return (
@@ -36,6 +44,19 @@ function App() {
         <Route path="/onboarding/business/info" element={<OnboardingBusinessInfo />} />
         <Route path="/onboarding/personal/info" element={<OnboardingPersonalInfo />} />
         <Route path="/onboarding/portfolio/info" element={<OnboardingPortfolioInfo />} />
+        
+        {/* New Template Routes */}
+        <Route path="/templates/portfolio" element={<PortfolioTemplates />} />
+        <Route path="/templates/e-commerce" element={<ECommerceTemplates />} />
+        <Route path="/templates/business-showcase" element={<BusinessShowcaseTemplates />} />
+        <Route path="/templates/resume" element={<ResumeTemplates />} />
+        
+        {/* Request Form Routes */}
+        <Route path="/request/portfolio/:templateId" element={<PortfolioRequestForm />} />
+        <Route path="/request/e-commerce/:templateId" element={<ECommerceRequestForm />} />
+        <Route path="/request/business-showcase/:templateId" element={<BusinessRequestForm />} />
+        <Route path="/request/resume/:templateId" element={<ResumeRequestForm />} />
+        
         <Route path="/auth/signin" element={<SignIn />} />
         <Route path="/auth/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />

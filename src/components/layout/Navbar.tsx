@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -8,7 +9,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, Home, Layers } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -57,37 +58,20 @@ export const Navbar = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-300 hover:text-white">
-                    Features
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 w-[400px]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <Link
-                            to="/features"
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
-                          >
-                            <div className="mb-2 mt-4 text-lg font-medium text-white">
-                              Website Builder
-                            </div>
-                            <p className="text-sm leading-tight text-white/90">
-                              Create stunning websites with our easy-to-use builder
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
+                  <Link to="/" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <Home className="w-4 h-4 mr-1" />
+                    Home
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/onboarding" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <Layers className="w-4 h-4 mr-1" />
+                    Onboarding
+                  </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link to="/pricing" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                     Pricing
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/about" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                    About
                   </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -143,16 +127,24 @@ export const Navbar = () => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
+                to="/"
+                className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Link>
+              <Link
+                to="/onboarding"
+                className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <Layers className="w-4 h-4 mr-2" />
+                Onboarding
+              </Link>
+              <Link
                 to="/pricing"
                 className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
               >
                 Pricing
-              </Link>
-              <Link
-                to="/about"
-                className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                About
               </Link>
               {user ? (
                 <>

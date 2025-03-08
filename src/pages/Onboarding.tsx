@@ -1,9 +1,9 @@
+
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Building2, User, Briefcase } from "lucide-react";
+import { Briefcase, ShoppingBag, User, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 const websiteTypes = [
@@ -12,30 +12,39 @@ const websiteTypes = [
     title: "Portfolio Website",
     description: "Showcase your work and skills professionally",
     icon: Briefcase,
+    route: "/templates/portfolio"
   },
   {
-    id: "business",
-    title: "Business Website",
-    description: "Establish your business presence online",
-    icon: Building2,
+    id: "e-commerce",
+    title: "E-commerce Website",
+    description: "Sell products and services online",
+    icon: ShoppingBag,
+    route: "/templates/e-commerce"
   },
   {
-    id: "personal",
-    title: "Personal Website",
-    description: "Share your story and information",
+    id: "business-showcase",
+    title: "Business Showcase Website",
+    description: "Present your business to potential customers",
     icon: User,
+    route: "/templates/business-showcase"
   },
+  {
+    id: "resume",
+    title: "Professional Resume Website",
+    description: "Create a digital version of your resume",
+    icon: FileText,
+    route: "/templates/resume"
+  }
 ];
 
 const Onboarding = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSelection = (typeId: string) => {
+  const handleSelection = (typeId: string, route: string) => {
     setSelectedType(typeId);
-    toast.success("Website type selected!");
-    // Navigate to the information collection form
-    navigate(`/onboarding/${typeId}/info`);
+    toast.success(`${typeId.charAt(0).toUpperCase() + typeId.slice(1)} website type selected!`);
+    navigate(route);
   };
 
   return (
@@ -49,7 +58,7 @@ const Onboarding = () => {
             Select the type of website that best fits your needs
           </p>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             {websiteTypes.map((type) => (
               <Card
                 key={type.id}
@@ -58,7 +67,7 @@ const Onboarding = () => {
                     ? "border-primary ring-2 ring-primary/20"
                     : "border-gray-800 hover:border-primary/50"
                 }`}
-                onClick={() => handleSelection(type.id)}
+                onClick={() => handleSelection(type.id, type.route)}
               >
                 <div className="flex flex-col items-center text-center space-y-4">
                   <div className="p-3 rounded-full bg-primary/10">

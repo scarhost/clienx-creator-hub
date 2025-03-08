@@ -39,7 +39,7 @@ export const AdminAddonRequestsTab = () => {
   const fetchAddonRequests = async (status = 'pending') => {
     try {
       setLoading(true);
-      // Use a more generic approach to bypass TypeScript errors
+      // Use a more explicit type assertion for the query
       const { data, error } = await supabase
         .from('addon_requests' as any)
         .select(`
@@ -55,7 +55,8 @@ export const AdminAddonRequestsTab = () => {
         return;
       }
 
-      setAddonRequests(data || []);
+      // Explicitly cast the data to our expected type
+      setAddonRequests(data as unknown as AddonRequest[] || []);
     } catch (error) {
       console.error('Error:', error);
       toast.error('An unexpected error occurred');

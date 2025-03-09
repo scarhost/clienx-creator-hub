@@ -12,28 +12,28 @@ const websiteTypes = [
     title: "Portfolio Website",
     description: "Showcase your work and skills professionally",
     icon: Briefcase,
-    route: "/templates/portfolio"
+    route: "/onboarding/portfolio"
   },
   {
     id: "e-commerce",
     title: "E-commerce Website",
     description: "Sell products and services online",
     icon: ShoppingBag,
-    route: "/templates/e-commerce"
+    route: "/onboarding/e-commerce"
   },
   {
     id: "business-showcase",
     title: "Business Showcase Website",
     description: "Present your business to potential customers",
     icon: User,
-    route: "/templates/business-showcase"
+    route: "/onboarding/business-showcase"
   },
   {
     id: "resume",
     title: "Professional Resume Website",
     description: "Create a digital version of your resume",
     icon: FileText,
-    route: "/templates/resume"
+    route: "/onboarding/resume"
   }
 ];
 

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { ExternalLink, CheckCircle, XCircle } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';

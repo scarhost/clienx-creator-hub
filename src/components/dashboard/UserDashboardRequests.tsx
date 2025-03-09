@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -100,7 +101,7 @@ export const UserDashboardRequests = () => {
           <p className="text-sm text-muted-foreground text-center mb-6">
             You haven't made any website requests yet.
           </p>
-          <Button onClick={() => window.location.href = "/templates"}>
+          <Button onClick={() => window.location.href = "/onboarding"}>
             Browse Templates
           </Button>
         </CardContent>

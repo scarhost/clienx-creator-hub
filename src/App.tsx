@@ -36,7 +36,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Index />} />
-        {/* Redirect all /templates routes to /onboarding */}
+        {/* All template routes go to onboarding */}
         <Route path="/templates" element={<Onboarding />} />
         <Route path="/preview-template" element={<Onboarding />} />
         <Route path="/onboarding" element={<Onboarding />} />
@@ -44,7 +44,7 @@ function App() {
         <Route path="/onboarding/personal/info" element={<OnboardingPersonalInfo />} />
         <Route path="/onboarding/portfolio/info" element={<OnboardingPortfolioInfo />} />
         
-        {/* Template Routes */}
+        {/* Template Routes - Updated to use /onboarding prefix */}
         <Route path="/onboarding/portfolio" element={<PortfolioTemplates />} />
         <Route path="/onboarding/e-commerce" element={<ECommerceTemplates />} />
         <Route path="/onboarding/business-showcase" element={<BusinessShowcaseTemplates />} />
